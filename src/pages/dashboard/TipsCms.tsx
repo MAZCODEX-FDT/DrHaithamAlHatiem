@@ -5,6 +5,7 @@ import { uid, useStore } from '@/data/store'
 import { iso } from '@/data/seed'
 import type { L, Tip } from '@/data/types'
 import { BilingualField, Drawer, Empty, Field, PageHeader, Toggle, fmtDate } from './ui'
+import { withBase } from '@/lib/base'
 
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 const emptyL = (): L => ({ en: '', ar: '' })
@@ -49,7 +50,7 @@ export default function TipsCms() {
                 </span>
                 <Toggle checked={t.published} onChange={(v) => patch('tips', t.id, { published: v })} />
                 {t.published && (
-                  <a href={`/guide/${t.slug}`} target="_blank" className="grid h-9 w-9 place-items-center rounded-full text-navy hover:bg-blue-20" aria-label="View">
+                  <a href={withBase(`/guide/${t.slug}`)} target="_blank" className="grid h-9 w-9 place-items-center rounded-full text-navy hover:bg-blue-20" aria-label="View">
                     <ExternalLink size={15} />
                   </a>
                 )}

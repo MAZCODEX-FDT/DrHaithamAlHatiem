@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import clsx from 'clsx'
 import { gsap, useReducedMotion } from '@/lib/smooth'
 import { useGSAP } from '@gsap/react'
+import { withBase } from '@/lib/base'
 
 /**
  * The wordmark is reproduced exactly from the brand master (never re-set in
@@ -10,7 +11,7 @@ import { useGSAP } from '@gsap/react'
 export function Wordmark({ tone = 'navy', className }: { tone?: 'navy' | 'white'; className?: string }) {
   return (
     <img
-      src={tone === 'navy' ? '/brand/wordmark-navy.png' : '/brand/wordmark-white.png'}
+      src={withBase(tone === 'navy' ? '/brand/wordmark-navy.png' : '/brand/wordmark-white.png')}
       alt="Dr. Haitham AlHatiem — Vascular & Endovascular Surgery"
       width={1600}
       height={198}
