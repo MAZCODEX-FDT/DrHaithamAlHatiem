@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useGSAP } from '@gsap/react'
@@ -7,7 +8,7 @@ import RotatingText from '@/components/reactbits/RotatingText'
 import Magnet from '@/components/reactbits/Magnet'
 import { FineRule } from '@/components/brand/Brand'
 import { usePublicData } from '@/data/store'
-import { dayFromIndex, useI18n } from '@/lib/i18n'
+import { useI18n } from '@/lib/i18n'
 import { gsap, useReducedMotion } from '@/lib/smooth'
 import { withBase } from '@/lib/base'
 
@@ -28,12 +29,11 @@ function useIsDesktop() {
 export function Hero({ ready }: { ready: boolean }) {
   const ref = useRef<HTMLElement>(null)
   const { t, tr, lang } = useI18n()
+  const heroLeading = lang === 'ar' ? 'leading-[1.2]!' : 'leading-[0.95]!'
   const { services, settings } = usePublicData()
   const reduced = useReducedMotion()
   const desktop = useIsDesktop()
 
-  const today = settings.hours.find((h) => h.day === dayFromIndex[new Date().getDay()])
-  const openToday = today && !today.closed
 
   useGSAP(
     () => {
@@ -45,7 +45,6 @@ export function Hero({ ready }: { ready: boolean }) {
           .from('.hero-portrait', { clipPath: 'inset(100% 0 0 0 round 32px)', duration: 1.6 })
           .from('.hero-portrait img', { scale: 1.25, duration: 2 }, '<')
           .from('.hero-fade', { y: 24, opacity: 0, duration: 1, stagger: 0.08 }, '-=1.5')
-          .from('.hero-chip', { y: 20, opacity: 0, scale: 0.9, duration: 0.9, stagger: 0.12 }, '-=0.8')
       }
       // scroll: portrait drifts and the content lifts away
       gsap.to('.hero-portrait-inner', {
@@ -87,11 +86,13 @@ export function Hero({ ready }: { ready: boolean }) {
           <h1 className="sr-only">
             {t('hero.title1')} {t('hero.title2')}
           </h1>
-          <div aria-hidden className="mt-7 font-bold tracking-[-0.035em]">
+          {/* Arabic glyphs run wider and taller than Latin: a smaller size keeps each line on one row.
+              Leading goes on the BlurText <p>s themselves, since the Arabic body-text rule sets p line-height. */}
+          <div aria-hidden className={clsx('mt-7 font-bold', lang === 'ar' ? 'text-[clamp(2.4rem,5.4vw,5rem)]' : 'text-[clamp(3rem,8.4vw,7.6rem)] tracking-[-0.035em]')}>
             {ready && (
               <>
-                <BlurText key={lang + '1'} text={t('hero.title1')} animateBy="words" delay={120} stepDuration={0.45} trigger="load" className="text-[clamp(3rem,8.4vw,7.6rem)] leading-[0.95]" />
-                <BlurText key={lang + '2'} text={t('hero.title2')} animateBy="words" delay={120} stepDuration={0.45} trigger="load" className="text-[clamp(3rem,8.4vw,7.6rem)] leading-[0.95] text-vessel" />
+                <BlurText key={lang + '1'} text={t('hero.title1')} animateBy="words" delay={120} stepDuration={0.45} trigger="load" className={heroLeading} />
+                <BlurText key={lang + '2'} text={t('hero.title2')} animateBy="words" delay={120} stepDuration={0.45} trigger="load" className={clsx(heroLeading, 'text-vessel')} />
               </>
             )}
           </div>
@@ -132,23 +133,6 @@ export function Hero({ ready }: { ready: boolean }) {
               <img src={withBase('/brand/portrait-full.jpg')} alt={tr(settings.doctor.name)} className="h-full w-full object-cover object-top" fetchPriority="high" />
             </div>
             <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-navy/50 to-transparent" />
-          </div>
-
-          {/* floating credential chips */}
-          <div className="hero-chip absolute -start-2 top-[14%] rounded-2xl bg-white/90 px-4 py-3 text-navy shadow-2xl backdrop-blur-xl sm:-start-8">
-            <p className="label !text-deep">FRCS</p>
-            <p className="text-sm font-semibold">{lang === 'ar' ? 'الكلية الملكية · بريطانيا' : 'Royal College · UK'}</p>
-          </div>
-          <div className="hero-chip absolute -end-1 bottom-[16%] flex items-center gap-3 rounded-2xl bg-white/90 px-4 py-3 text-navy shadow-2xl backdrop-blur-xl sm:-end-6">
-            <span className={`relative h-2.5 w-2.5 rounded-full ${openToday ? 'animate-pulse-dot bg-emerald-500' : 'bg-blush'}`} />
-            <div>
-              <p className="text-sm font-semibold">{openToday ? t('hero.open') : t('hero.closed')}</p>
-              {openToday && today && (
-                <p className="text-xs text-deep" dir="ltr">
-                  {today.byAppointment ? t('contact.byAppt') : `${today.open} – ${today.close}`}
-                </p>
-              )}
-            </div>
           </div>
         </div>
       </div>

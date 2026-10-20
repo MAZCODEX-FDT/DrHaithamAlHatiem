@@ -25,8 +25,6 @@ const dict = {
     ar: 'تشخيص وعلاج الأوردة والشرايين — بشرح واضح، وعلاج دقيق، ومتابعة شخصية.',
   },
   'hero.scroll': { en: 'Scroll', ar: 'مرّر' },
-  'hero.open': { en: 'Clinic open today', ar: 'العيادة مفتوحة اليوم' },
-  'hero.closed': { en: 'Clinic closed today', ar: 'العيادة مغلقة اليوم' },
   'rot.label': { en: 'Specialist care for', ar: 'رعاية متخصصة لـ' },
   'about.label': { en: 'The doctor', ar: 'الطبيب' },
   'about.statement': {
@@ -70,6 +68,7 @@ const dict = {
   'tips.label': { en: 'Patient guide', ar: 'دليل المريض' },
   'tips.title': { en: 'Health tips, written plainly.', ar: 'نصائح صحية بلغة بسيطة.' },
   'tips.min': { en: 'min read', ar: 'دقائق قراءة' },
+  'tips.all': { en: 'All topics', ar: 'كل المواضيع' },
   'faq.label': { en: 'Questions', ar: 'أسئلة شائعة' },
   'faq.title': { en: 'Before you visit.', ar: 'قبل زيارتك.' },
   'contact.label': { en: 'Visit the clinic', ar: 'زُر العيادة' },

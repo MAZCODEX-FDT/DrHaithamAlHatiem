@@ -330,6 +330,142 @@ export const tips: Tip[] = [
     published: true,
     date: '2026-08-14',
   },
+  {
+    id: 'tip-5',
+    slug: 'swollen-leg-when-urgent',
+    category: { en: 'Clots', ar: 'الجلطات' },
+    title: { en: 'One swollen leg: when is it urgent?', ar: 'تورم ساق واحدة: متى يكون الأمر عاجلاً؟' },
+    excerpt: {
+      en: 'Swelling in both ankles is common. Swelling, warmth and pain in one leg needs a same-day check.',
+      ar: 'تورم الكاحلين معاً أمر شائع، أما التورم مع السخونة والألم في ساق واحدة فيحتاج فحصاً في نفس اليوم.',
+    },
+    body: {
+      en: 'Mild swelling in both ankles at the end of a hot day or a long flight usually settles overnight. Swelling in one leg is different, especially when the calf is also warm, tender or a different colour. These can be signs of a deep vein thrombosis (DVT), a clot in a deep leg vein.\n\nA DVT is diagnosed with a painless Doppler ultrasound. When it is found early, blood-thinning treatment works well and lowers the risk of the clot moving or causing long-term leg problems.\n\nCall the clinic the same day if one leg suddenly becomes swollen and painful. Go to emergency care straight away if you also feel short of breath, have chest pain or cough up blood.',
+      ar: 'التورم الخفيف في الكاحلين معاً بعد يوم حار أو رحلة طويلة يزول عادة بعد ليلة من الراحة. أما تورم ساق واحدة فأمر مختلف، خاصة إذا كانت السمانة دافئة أو مؤلمة عند اللمس أو تغير لونها. فقد تكون هذه علامات جلطة الأوردة العميقة، وهي جلطة في أحد أوردة الساق العميقة.\n\nتُشخص الجلطة بفحص دوبلر بالموجات الصوتية دون أي ألم. وعند اكتشافها مبكراً يكون علاج سيولة الدم فعالاً، ويقلل خطر انتقال الجلطة أو حدوث مشكلات مزمنة في الساق.\n\nاتصل بالعيادة في نفس اليوم إذا تورمت ساق واحدة فجأة مع ألم. وتوجه إلى الطوارئ فوراً إذا شعرت أيضاً بضيق في التنفس أو ألم في الصدر أو سعال مصحوب بدم.',
+    },
+    readMins: 3,
+    published: true,
+    date: '2026-10-14',
+  },
+  {
+    id: 'tip-6',
+    slug: 'spider-veins-or-varicose-veins',
+    category: { en: 'Veins', ar: 'الأوردة' },
+    title: { en: 'Spider veins or varicose veins: what is the difference?', ar: 'الشعيرات الدموية أم الدوالي: ما الفرق؟' },
+    excerpt: {
+      en: 'Both are veins you can see, but they differ in size, symptoms and treatment.',
+      ar: 'كلاهما أوردة ظاهرة على الجلد، لكنهما يختلفان في الحجم والأعراض وطريقة العلاج.',
+    },
+    body: {
+      en: 'Spider veins are fine red, blue or purple lines just under the skin, often on the thighs and around the ankles. They are usually harmless and treated mainly for appearance.\n\nVaricose veins are larger, bulging and twisted veins, 3 mm or more across. They come from weak valves in the vein and can cause heaviness, aching, itching, night cramps and ankle swelling. Over years, untreated varicose veins can lead to skin changes and, in some people, ulcers near the ankle.\n\nA Doppler scan shows whether the visible veins are fed by a leaking vein deeper down. Spider veins usually respond to sclerotherapy, small injections that close them. Varicose veins are now mostly treated from the inside with heat or medical glue through a needle, and you walk out the same day.',
+      ar: 'الشعيرات الدموية خطوط رفيعة حمراء أو زرقاء أو بنفسجية تحت الجلد مباشرة، تظهر غالباً على الفخذين وحول الكاحلين. وهي في الغالب غير ضارة، ويكون علاجها لأسباب جمالية أساساً.\n\nأما الدوالي فأوردة أكبر بارزة وملتوية، قطرها ٣ ملم أو أكثر، وسببها ضعف الصمامات داخل الوريد. وقد تسبب ثقلاً وألماً وحكة وتقلصات ليلية وتورماً في الكاحل. ومع مرور السنوات قد تؤدي الدوالي غير المعالجة إلى تغيرات في الجلد، وعند بعض المرضى إلى قرح قرب الكاحل.\n\nيوضح فحص الدوبلر ما إذا كانت الأوردة الظاهرة تتغذى من وريد أعمق به ارتجاع. وتستجيب الشعيرات عادة للحقن التصليبي، وهو حقن صغيرة تغلقها. أما الدوالي فتُعالج اليوم غالباً من الداخل بالحرارة أو باللاصق الطبي عبر إبرة، وتعود إلى منزلك في نفس اليوم.',
+    },
+    readMins: 4,
+    published: true,
+    date: '2026-10-07',
+  },
+  {
+    id: 'tip-7',
+    slug: 'after-varicose-vein-treatment',
+    category: { en: 'Recovery', ar: 'التعافي' },
+    title: { en: 'After varicose vein treatment: your first two weeks', ar: 'بعد علاج الدوالي: أول أسبوعين' },
+    excerpt: {
+      en: 'Walking is part of the treatment. Here is what is normal, what helps and when to call.',
+      ar: 'المشي جزء من العلاج. إليك ما هو طبيعي، وما يساعد، ومتى تتصل بنا.',
+    },
+    body: {
+      en: 'Walk on the same day: a short walk every hour while awake keeps blood moving in the deep veins. Wear the compression stocking for as long as you were advised, and return to desk work within a day or two.\n\nBruising, a pulling feeling along the treated vein and a firm, tender cord under the skin are all normal. They fade over two to three weeks. Simple painkillers help.\n\nFor about two weeks, avoid heavy lifting, intense exercise, long hot baths and saunas. Call the clinic if the pain gets worse instead of better, if your calf becomes swollen, or if you develop a fever. You will be seen again for a follow-up scan to confirm the vein has closed.',
+      ar: 'امشِ في نفس اليوم: نزهة قصيرة كل ساعة أثناء اليقظة تحافظ على حركة الدم في الأوردة العميقة. ارتدِ الجورب الضاغط للمدة التي حددها الطبيب، ويمكنك العودة إلى العمل المكتبي خلال يوم أو يومين.\n\nالكدمات، والإحساس بشد على امتداد الوريد المعالج، ووجود حبل صلب ومؤلم قليلاً تحت الجلد، كلها أمور طبيعية تختفي خلال أسبوعين إلى ثلاثة. وتساعد المسكنات البسيطة.\n\nتجنب لمدة أسبوعين تقريباً حمل الأشياء الثقيلة، والرياضة العنيفة، والحمام الساخن الطويل، والساونا. واتصل بالعيادة إذا زاد الألم بدلاً من أن يتحسن، أو تورمت السمانة، أو ارتفعت حرارتك. وستعود لفحص متابعة بالدوبلر للتأكد من انغلاق الوريد.',
+    },
+    readMins: 3,
+    published: true,
+    date: '2026-09-21',
+  },
+  {
+    id: 'tip-8',
+    slug: 'compression-stockings-guide',
+    category: { en: 'Veins', ar: 'الأوردة' },
+    title: { en: 'Compression stockings: how to choose and wear them', ar: 'الجوارب الضاغطة: كيف تختارها وترتديها' },
+    excerpt: {
+      en: 'They only work if they fit and you can get them on. A few practical tips make all the difference.',
+      ar: 'لا تفيد إلا إذا كانت بالمقاس الصحيح واستطعت ارتداءها. بعض النصائح العملية تصنع الفرق.',
+    },
+    body: {
+      en: 'Compression stockings squeeze the leg most firmly at the ankle and less towards the knee, helping the veins push blood upwards. The strength and length should be prescribed for you. Measure the ankle and calf in the morning, before the leg swells.\n\nPut them on first thing in the morning. Turn the stocking inside out down to the heel, slip your foot in, then roll it up gradually without bunching. Rubber gloves make gripping much easier. Take them off at night.\n\nWash them by hand and replace them every three to six months, as they lose pressure over time. If you have diabetes, numbness in the feet or known artery disease, check with the doctor first: compression is not safe for everyone.',
+      ar: 'تضغط الجوارب الضاغطة على الساق بأكبر قوة عند الكاحل وتقل تدريجياً نحو الركبة، فتساعد الأوردة على دفع الدم إلى أعلى. ويجب أن يحدد الطبيب درجة الضغط والطول المناسبين لك. قِس محيط الكاحل والسمانة صباحاً قبل أن تتورم الساق.\n\nارتدِها أول شيء في الصباح: اقلب الجورب للداخل حتى الكعب، وأدخل قدمك، ثم اسحبه لأعلى تدريجياً دون تجاعيد. القفازات المطاطية تسهل الإمساك به كثيراً. واخلعها ليلاً.\n\nاغسلها باليد، واستبدلها كل ثلاثة إلى ستة أشهر لأنها تفقد ضغطها مع الوقت. وإذا كنت مريض سكري، أو تعاني تنميلاً في القدمين، أو لديك مرض معروف في الشرايين، فاستشر الطبيب أولاً: فالضغط ليس آمناً للجميع.',
+    },
+    readMins: 4,
+    published: true,
+    date: '2026-07-30',
+  },
+  {
+    id: 'tip-9',
+    slug: 'aortic-aneurysm-screening',
+    category: { en: 'Arteries', ar: 'الشرايين' },
+    title: { en: 'Aortic aneurysm: who should have a screening scan?', ar: 'تمدد الشريان الأورطي: من يحتاج إلى فحص؟' },
+    excerpt: {
+      en: 'Most aneurysms cause no symptoms until they are large. A 10-minute ultrasound finds them early.',
+      ar: 'معظم حالات التمدد لا تسبب أعراضاً حتى تكبر. وفحص بالموجات الصوتية لمدة ١٠ دقائق يكشفها مبكراً.',
+    },
+    body: {
+      en: 'The aorta is the main artery running through the abdomen. In some people its wall weakens and slowly balloons outwards. This is an abdominal aortic aneurysm. It rarely causes symptoms, which is why it is worth looking for.\n\nA screening scan is especially worth considering for men aged 65 or over, anyone who smokes or used to smoke, people with high blood pressure, and anyone with a parent or sibling who had an aneurysm. The check is a painless ultrasound of the abdomen, and the result is clear on the same visit.\n\nSmall aneurysms are usually watched with regular scans, alongside stopping smoking and controlling blood pressure. Larger ones can be repaired, often with a stent graft placed through small cuts in the groin. Sudden severe pain in the abdomen or back is an emergency.',
+      ar: 'الأورطي هو الشريان الرئيسي الذي يمر عبر البطن. وعند بعض الأشخاص يضعف جداره ويتمدد للخارج ببطء، وهذا هو تمدد الشريان الأورطي البطني. ونادراً ما يسبب أعراضاً، ولهذا يستحق البحث عنه.\n\nيُنصح بالفحص بشكل خاص للرجال في سن ٦٥ عاماً أو أكثر، والمدخنين حالياً أو سابقاً، ومرضى ضغط الدم المرتفع، ومن أُصيب أحد والديه أو إخوته بالتمدد. والفحص موجات صوتية على البطن دون أي ألم، والنتيجة واضحة في نفس الزيارة.\n\nتُتابع حالات التمدد الصغيرة عادة بفحوصات دورية، مع التوقف عن التدخين وضبط ضغط الدم. أما الكبيرة فيمكن إصلاحها، غالباً بدعامة مغطاة تُركب عبر فتحات صغيرة في أعلى الفخذ. والألم الشديد المفاجئ في البطن أو الظهر حالة طوارئ.',
+    },
+    readMins: 4,
+    published: true,
+    date: '2026-07-16',
+  },
+  {
+    id: 'tip-10',
+    slug: 'caring-for-dialysis-fistula',
+    category: { en: 'Dialysis access', ar: 'وصلات الغسيل' },
+    title: { en: 'Caring for your dialysis fistula every day', ar: 'العناية اليومية بوصلة الغسيل الكلوي' },
+    excerpt: {
+      en: 'Your fistula is your lifeline. A daily check and a few simple rules help it last for years.',
+      ar: 'الوصلة هي شريان حياتك. فحص يومي وبعض القواعد البسيطة تساعدها على الاستمرار لسنوات.',
+    },
+    body: {
+      en: 'Check your fistula every morning and evening. Rest your fingers lightly on it and you should feel a buzz, called the thrill. Hold it near your ear and you will hear a whooshing sound.\n\nProtect the arm: no blood pressure readings, blood tests or drips on the fistula arm. Avoid tight sleeves, watches and bracelets, do not carry heavy bags on that arm and try not to sleep on it. Keep the skin clean, and wash the arm before every dialysis session.\n\nCall the clinic the same day if the buzz becomes weak or stops, if the arm becomes red, hot, swollen or painful, or if your hand turns cold or numb. A fistula that has just stopped can often be saved if it is treated quickly.',
+      ar: 'افحص الوصلة كل صباح ومساء: ضع أصابعك عليها برفق ويجب أن تشعر برعشة أو اهتزاز. وإذا قربتها من أذنك ستسمع صوت تدفق مستمر.\n\nاحمِ الذراع: لا قياس ضغط ولا سحب دم ولا محاليل في ذراع الوصلة. وتجنب الأكمام الضيقة والساعة والأساور، ولا تحمل حقائب ثقيلة بتلك الذراع، وحاول ألا تنام عليها. وحافظ على نظافة الجلد، واغسل الذراع قبل كل جلسة غسيل.\n\nاتصل بالعيادة في نفس اليوم إذا ضعفت الرعشة أو توقفت، أو احمرت الذراع أو سخنت أو تورمت أو آلمتك، أو أصبحت يدك باردة أو منملة. فالوصلة التي توقفت حديثاً يمكن إنقاذها غالباً إذا عولجت بسرعة.',
+    },
+    readMins: 3,
+    published: true,
+    date: '2026-07-02',
+  },
+  {
+    id: 'tip-11',
+    slug: 'smoking-and-your-arteries',
+    category: { en: 'Prevention', ar: 'الوقاية' },
+    title: { en: 'Smoking and your arteries: it is never too late to stop', ar: 'التدخين وشرايينك: لم يفت الأوان أبداً للإقلاع' },
+    excerpt: {
+      en: 'Smoking is the strongest risk factor for blocked leg arteries. Stopping helps at any age.',
+      ar: 'التدخين أقوى عوامل خطر انسداد شرايين الساقين، والإقلاع عنه مفيد في أي عمر.',
+    },
+    body: {
+      en: 'Tobacco damages the lining of the arteries, makes the blood more likely to clot and speeds up the build-up of plaque. That is why most people with blocked leg arteries are current or former smokers, and why smoking raises the risk of aneurysm and amputation.\n\nThe benefits of stopping start quickly. Within weeks, circulation and walking distance often improve. After treatment such as a balloon or bypass, the opened artery stays open longer in people who have stopped. This applies to cigarettes, shisha and chewed tobacco alike.\n\nYou do not have to do it alone. Ask at your next visit about a quitting plan. Nicotine replacement and medication can double your chances of success.',
+      ar: 'يتلف التبغ البطانة الداخلية للشرايين، ويزيد قابلية الدم للتجلط، ويسرع تراكم الترسبات. ولهذا فإن معظم مرضى انسداد شرايين الساقين مدخنون حاليون أو سابقون، ولهذا أيضاً يرفع التدخين خطر تمدد الشريان والبتر.\n\nتبدأ فوائد الإقلاع بسرعة: فخلال أسابيع تتحسن الدورة الدموية ومسافة المشي غالباً. وبعد علاج مثل البالون أو التحويلة، يبقى الشريان مفتوحاً لفترة أطول عند من أقلعوا. وينطبق هذا على السجائر والشيشة والتبغ الممضوغ على حد سواء.\n\nلست مضطراً لفعلها وحدك: اسأل في زيارتك القادمة عن خطة للإقلاع. فبدائل النيكوتين والأدوية قد تضاعف فرص نجاحك.',
+    },
+    readMins: 3,
+    published: true,
+    date: '2026-06-18',
+  },
+  {
+    id: 'tip-12',
+    slug: 'preparing-for-doppler-scan',
+    category: { en: 'Your visit', ar: 'زيارتك' },
+    title: { en: 'Preparing for your Doppler scan', ar: 'الاستعداد لفحص الدوبلر' },
+    excerpt: {
+      en: 'Painless, no needles and about 15 minutes. Here is how to get the most from it.',
+      ar: 'بلا ألم ولا إبر، ويستغرق نحو ١٥ دقيقة. إليك كيف تستفيد منه أكبر استفادة.',
+    },
+    body: {
+      en: 'A Doppler scan uses ultrasound to show blood flowing through your veins and arteries, live on screen. It is painless, uses no radiation and needs no injection.\n\nFor leg scans, wear loose clothing or shorts so the legs are easy to reach. There is no need to fast. For scans of the abdominal aorta, we may ask you not to eat for a few hours beforehand, and the clinic will tell you when you book.\n\nBring any previous scans, reports and your list of medicines. The doctor explains the images as the scan happens, so you leave knowing what was found and what the next step is.',
+      ar: 'يستخدم فحص الدوبلر الموجات الصوتية لإظهار تدفق الدم في الأوردة والشرايين مباشرة على الشاشة. وهو بلا ألم، وبلا إشعاع، ولا يحتاج إلى أي حقن.\n\nلفحص الساقين، ارتدِ ملابس واسعة أو قصيرة حتى يسهل الوصول إلى الساقين، ولا داعي للصيام. أما فحص الأورطي البطني فقد نطلب منك الامتناع عن الأكل لبضع ساعات قبله، وستخبرك العيادة بذلك عند الحجز.\n\nأحضر معك أي أشعة أو تقارير سابقة وقائمة أدويتك. ويشرح الطبيب الصور أثناء الفحص، فتغادر وأنت تعرف ما الذي وُجد وما الخطوة التالية.',
+    },
+    readMins: 2,
+    published: true,
+    date: '2026-06-04',
+  },
 ]
 
 /* ───────────────────────── Reviews ───────────────────────── */

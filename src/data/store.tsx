@@ -10,15 +10,43 @@ import type { CollectionKey, DB, Settings } from './types'
  * to move this onto a real backend — every consumer goes through this hook.
  */
 const KEY = 'dha:db:v1'
+/** Ids of seed articles this browser has already been given — see addNewSeedTips */
+const SEEN_TIPS_KEY = 'dha:seen-tips'
 
 function load(): DB {
   try {
     const raw = localStorage.getItem(KEY)
-    if (raw) return JSON.parse(raw) as DB
+    if (raw) return addNewSeedTips(JSON.parse(raw) as DB)
   } catch {
     /* storage unavailable or corrupt — fall back to seed */
   }
-  return createSeed()
+  const db = createSeed()
+  rememberSeedTips(db.tips.map((t) => t.id))
+  return db
+}
+
+/**
+ * Articles added to the seed after a browser first saved its data would never
+ * appear there. Hand over each new seed article once; one the clinic deleted
+ * stays deleted, because its id is already remembered.
+ */
+function addNewSeedTips(db: DB): DB {
+  const seedTips = createSeed().tips
+  const seenRaw = localStorage.getItem(SEEN_TIPS_KEY)
+  // data saved before this list existed had the first four seed articles
+  const seen = new Set<string>(seenRaw ? JSON.parse(seenRaw) : ['tip-1', 'tip-2', 'tip-3', 'tip-4'])
+  const have = new Set(db.tips.map((t) => t.id))
+  const fresh = seedTips.filter((t) => !seen.has(t.id) && !have.has(t.id))
+  rememberSeedTips(seedTips.map((t) => t.id))
+  return fresh.length ? { ...db, tips: [...db.tips, ...fresh] } : db
+}
+
+function rememberSeedTips(ids: string[]) {
+  try {
+    localStorage.setItem(SEEN_TIPS_KEY, JSON.stringify(ids))
+  } catch {
+    /* ignore */
+  }
 }
 
 function save(db: DB) {
