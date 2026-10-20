@@ -25,8 +25,6 @@ const dict = {
     ar: 'تشخيص وعلاج الأوردة والشرايين — بشرح واضح، وعلاج دقيق، ومتابعة شخصية.',
   },
   'hero.scroll': { en: 'Scroll', ar: 'مرّر' },
-  'hero.open': { en: 'Clinic open today', ar: 'العيادة مفتوحة اليوم' },
-  'hero.closed': { en: 'Clinic closed today', ar: 'العيادة مغلقة اليوم' },
   'rot.label': { en: 'Specialist care for', ar: 'رعاية متخصصة لـ' },
   'about.label': { en: 'The doctor', ar: 'الطبيب' },
   'about.statement': {
