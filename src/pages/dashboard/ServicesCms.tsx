@@ -5,6 +5,7 @@ import { ServiceIcon } from '@/components/brand/Icons'
 import { uid, useStore } from '@/data/store'
 import type { IconKey, L, Service } from '@/data/types'
 import { BilingualField, Drawer, Field, PageHeader, Toggle } from './ui'
+import { withBase } from '@/lib/base'
 
 const icons: IconKey[] = ['varicose', 'arterial', 'diabetic', 'doppler', 'flow', 'endovascular', 'heart', 'shield', 'dialysis', 'aneurysm', 'dvt', 'spider']
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
@@ -74,7 +75,7 @@ export default function ServicesCms() {
               <p className="truncate text-sm text-deep">{s.short.en}</p>
             </div>
             <Toggle checked={s.active} onChange={(v) => patch('services', s.id, { active: v })} label={s.active ? 'Live' : 'Hidden'} />
-            <a href={`/services/${s.slug}`} target="_blank" className="grid h-10 w-10 place-items-center rounded-full text-navy hover:bg-blue-20" aria-label="View on site">
+            <a href={withBase(`/services/${s.slug}`)} target="_blank" className="grid h-10 w-10 place-items-center rounded-full text-navy hover:bg-blue-20" aria-label="View on site">
               <ExternalLink size={16} />
             </a>
             <button onClick={() => setEdit(s)} className="btn h-10 bg-blue-20 px-4 text-navy hover:bg-blue-40">

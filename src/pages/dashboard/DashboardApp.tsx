@@ -33,6 +33,7 @@ import ReviewsPage from './Reviews'
 import Inquiries from './Inquiries'
 import SettingsPage from './Settings'
 import Tools from './Tools'
+import { withBase } from '@/lib/base'
 
 /**
  * Front-end demo gate. A production deployment must put the dashboard behind
@@ -206,14 +207,14 @@ function Shell({ onLogout }: { onLogout: () => void }) {
         ))}
       </nav>
       <div className="mt-6 space-y-1 border-t border-white/10 pt-4">
-        <a href="/" target="_blank" className="flex h-11 items-center gap-3 rounded-xl px-3 text-sm text-white/70 hover:bg-white/[0.07] hover:text-white">
+        <a href={withBase('/')} target="_blank" className="flex h-11 items-center gap-3 rounded-xl px-3 text-sm text-white/70 hover:bg-white/[0.07] hover:text-white">
           <ExternalLink size={18} strokeWidth={1.8} /> View website
         </a>
         <button onClick={onLogout} className="flex h-11 w-full items-center gap-3 rounded-xl px-3 text-sm text-white/70 hover:bg-white/[0.07] hover:text-white">
           <LogOut size={18} strokeWidth={1.8} /> Sign out
         </button>
         <div className="mt-3 flex items-center gap-3 rounded-2xl bg-white/[0.06] p-3">
-          <img src="/brand/portrait-crop.jpg" alt="" className="h-10 w-10 rounded-full object-cover object-top" />
+          <img src={withBase('/brand/portrait-crop.jpg')} alt="" className="h-10 w-10 rounded-full object-cover object-top" />
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-white">Dr. Haitham AlHatiem</p>
             <p className="truncate text-xs text-white/50">Consultant · Admin</p>

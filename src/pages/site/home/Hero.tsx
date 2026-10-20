@@ -9,6 +9,7 @@ import { FineRule } from '@/components/brand/Brand'
 import { usePublicData } from '@/data/store'
 import { dayFromIndex, useI18n } from '@/lib/i18n'
 import { gsap, useReducedMotion } from '@/lib/smooth'
+import { withBase } from '@/lib/base'
 
 // WebGL — the flowing threads read as blood moving through vessels
 const Threads = lazy(() => import('@/components/reactbits/Threads'))
@@ -128,7 +129,7 @@ export function Hero({ ready }: { ready: boolean }) {
         <div className="relative lg:col-span-5">
           <div className="hero-portrait relative mx-auto aspect-[880/1100] w-full max-w-[460px] overflow-hidden rounded-[32px] bg-mist">
             <div className="hero-portrait-inner absolute inset-0 -top-[8%]">
-              <img src="/brand/portrait-full.jpg" alt={tr(settings.doctor.name)} className="h-full w-full object-cover object-top" fetchPriority="high" />
+              <img src={withBase('/brand/portrait-full.jpg')} alt={tr(settings.doctor.name)} className="h-full w-full object-cover object-top" fetchPriority="high" />
             </div>
             <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-navy/50 to-transparent" />
           </div>

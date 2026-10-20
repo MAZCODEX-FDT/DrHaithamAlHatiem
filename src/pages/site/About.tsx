@@ -5,6 +5,7 @@ import { MaskHeading, Reveal } from '@/components/site/ui'
 import { usePublicData } from '@/data/store'
 import { useI18n } from '@/lib/i18n'
 import { Clinic, CtaBand, Journey, Values } from './home/Sections'
+import { withBase } from '@/lib/base'
 
 export default function About() {
   const { t, tr, lang } = useI18n()
@@ -43,7 +44,7 @@ export default function About() {
           </div>
           <Reveal className="lg:col-span-5" delay={0.15}>
             <div className="relative overflow-hidden rounded-[32px] bg-mist">
-              <img src="/brand/portrait-full.jpg" alt={tr(settings.doctor.name)} className="aspect-[880/1100] w-full object-cover object-top" />
+              <img src={withBase('/brand/portrait-full.jpg')} alt={tr(settings.doctor.name)} className="aspect-[880/1100] w-full object-cover object-top" />
             </div>
           </Reveal>
         </div>

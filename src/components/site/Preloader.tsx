@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { useGSAP } from '@gsap/react'
 import { useLenis } from 'lenis/react'
 import { gsap, useReducedMotion } from '@/lib/smooth'
+import { withBase } from '@/lib/base'
 
 /**
  * First-visit intro: the pulse line draws across the screen, the wordmark
@@ -69,7 +70,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
           opacity={0.6}
         />
       </svg>
-      <img src="/brand/wordmark-white.png" alt="" className="pl-mark relative w-[min(78vw,620px)] opacity-0" />
+      <img src={withBase('/brand/wordmark-white.png')} alt="" className="pl-mark relative w-[min(78vw,620px)] opacity-0" />
       <p className="pl-count label absolute bottom-10 text-white/60 opacity-0">Healthy vessels · Healthy life</p>
     </div>
   )

@@ -14,6 +14,7 @@ import { Accordion, Marquee, Reveal, ReviewCard, SectionHeading, ServiceCard } f
 import { usePublicData } from '@/data/store'
 import { formatDate, useI18n, type DictKey } from '@/lib/i18n'
 import { gsap, useReducedMotion } from '@/lib/smooth'
+import { withBase } from '@/lib/base'
 
 /* ─────────── Conditions ticker ─────────── */
 export function ConditionsTicker() {
@@ -60,7 +61,7 @@ export function AboutIntro() {
         <div className="mt-16 grid gap-4 md:grid-cols-6 lg:grid-cols-12">
           <Reveal className="md:col-span-3 lg:col-span-4 lg:row-span-2">
             <div className="relative h-full min-h-[420px] overflow-hidden rounded-[28px] bg-mist">
-              <img src="/brand/portrait-crop.jpg" alt={tr(settings.doctor.name)} className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+              <img src={withBase('/brand/portrait-crop.jpg')} alt={tr(settings.doctor.name)} className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
               <div className="absolute inset-x-3 bottom-3 rounded-2xl bg-white/85 p-5 backdrop-blur-xl">
                 <p className="text-lg font-bold text-navy">{tr(settings.doctor.name)}</p>
                 <p className="text-sm text-deep">{tr(settings.doctor.title)}</p>
@@ -275,9 +276,9 @@ export function Clinic() {
   const { t } = useI18n()
   const reduced = useReducedMotion()
   const images = [
-    { src: '/brand/consultation-room.jpg', k: 'clinic.room' as DictKey, cls: 'lg:col-span-7 aspect-[4/3]' },
-    { src: '/brand/waiting-area.jpg', k: 'clinic.waiting' as DictKey, cls: 'lg:col-span-5 aspect-[4/5] lg:mt-24' },
-    { src: '/brand/credentials-wall.jpg', k: 'clinic.wall' as DictKey, cls: 'lg:col-span-6 lg:col-start-4 aspect-[4/3]' },
+    { src: withBase('/brand/consultation-room.jpg'), k: 'clinic.room' as DictKey, cls: 'lg:col-span-7 aspect-[4/3]' },
+    { src: withBase('/brand/waiting-area.jpg'), k: 'clinic.waiting' as DictKey, cls: 'lg:col-span-5 aspect-[4/5] lg:mt-24' },
+    { src: withBase('/brand/credentials-wall.jpg'), k: 'clinic.wall' as DictKey, cls: 'lg:col-span-6 lg:col-start-4 aspect-[4/3]' },
   ]
 
   useGSAP(
