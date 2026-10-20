@@ -1,7 +1,7 @@
 import { useEffect, type ReactNode } from 'react'
 import clsx from 'clsx'
 import { X } from 'lucide-react'
-import type { AppointmentStatus, L, ReviewStatus } from '@/data/types'
+import type { L, ReviewStatus } from '@/data/types'
 
 export function PageHeader({ title, sub, actions }: { title: string; sub?: string; actions?: ReactNode }) {
   return (
@@ -50,21 +50,17 @@ export function Kpi({ label, value, delta, hint, icon, tone = 'light' }: { label
   )
 }
 
-const statusStyle: Record<AppointmentStatus | ReviewStatus, string> = {
+const statusStyle: Record<ReviewStatus, string> = {
   pending: 'bg-amber-50 text-amber-800 ring-amber-200',
-  confirmed: 'bg-blue-20 text-navy ring-blue-40',
-  completed: 'bg-emerald-50 text-emerald-800 ring-emerald-200',
-  cancelled: 'bg-slate-100 text-slate-600 ring-slate-200',
-  'no-show': 'bg-rose-50 text-rose-700 ring-rose-200',
   approved: 'bg-emerald-50 text-emerald-800 ring-emerald-200',
   hidden: 'bg-slate-100 text-slate-600 ring-slate-200',
 }
 
-export function StatusBadge({ status }: { status: AppointmentStatus | ReviewStatus }) {
+export function StatusBadge({ status }: { status: ReviewStatus }) {
   return (
     <span className={clsx('inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold capitalize ring-1 ring-inset', statusStyle[status])}>
       <span className="h-1.5 w-1.5 rounded-full bg-current opacity-70" />
-      {status.replace('-', ' ')}
+      {status}
     </span>
   )
 }
@@ -177,33 +173,6 @@ export function Segmented<T extends string>({ value, onChange, options }: { valu
   )
 }
 
-export function age(dob: string) {
-  const d = new Date(dob)
-  const now = new Date()
-  let a = now.getFullYear() - d.getFullYear()
-  if (now < new Date(now.getFullYear(), d.getMonth(), d.getDate())) a--
-  return a
-}
-
 export function fmtDate(isoDate: string, opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' }) {
   return new Date(isoDate.length === 10 ? isoDate + 'T00:00:00' : isoDate).toLocaleDateString('en-GB', opts)
-}
-
-export function relTime(isoDate: string) {
-  const diff = (Date.now() - new Date(isoDate).getTime()) / 1000
-  if (diff < 60) return 'just now'
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
-  return `${Math.floor(diff / 86400)}d ago`
-}
-
-/** ABI interpretation — standard vascular thresholds */
-export function abiBand(v?: number): { label: string; cls: string } {
-  if (v === undefined || Number.isNaN(v)) return { label: '—', cls: 'text-deep' }
-  if (v > 1.4) return { label: 'Non-compressible', cls: 'text-amber-700' }
-  if (v >= 1.0) return { label: 'Normal', cls: 'text-emerald-700' }
-  if (v >= 0.91) return { label: 'Borderline', cls: 'text-amber-700' }
-  if (v >= 0.7) return { label: 'Mild PAD', cls: 'text-amber-700' }
-  if (v >= 0.4) return { label: 'Moderate PAD', cls: 'text-rose-700' }
-  return { label: 'Severe / CLTI', cls: 'text-rose-800' }
 }

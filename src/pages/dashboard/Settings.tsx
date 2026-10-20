@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import clsx from 'clsx'
 import { Plus, RotateCcw, Trash2 } from 'lucide-react'
 import { uid, useStore } from '@/data/store'
-import type { Hours, Settings, Stat } from '@/data/types'
+import type { Branch, Hours, Settings, Stat } from '@/data/types'
 import { dayNames } from '@/lib/i18n'
 import { BilingualField, Field, PageHeader, Panel, Toggle } from './ui'
 
@@ -28,6 +28,7 @@ export default function SettingsPage() {
   const setDoctor = (k: keyof Settings['doctor'], v: Settings['doctor'][typeof k]) => setDraft((d) => ({ ...d, doctor: { ...d.doctor, [k]: v } }))
   const setHours = (i: number, h: Partial<Hours>) => set('hours', draft.hours.map((x, j) => (j === i ? { ...x, ...h } : x)))
   const setStat = (i: number, s: Partial<Stat>) => set('stats', draft.stats.map((x, j) => (j === i ? { ...x, ...s } : x)))
+  const setBranch = (i: number, b: Partial<Branch>) => set('branches', draft.branches.map((x, j) => (j === i ? { ...x, ...b } : x)))
 
   function save() {
     updateSettings(draft)
@@ -39,7 +40,7 @@ export default function SettingsPage() {
     <>
       <PageHeader
         title="Settings"
-        sub="Clinic details, hours and the content the website shows. Changes go live when you save."
+        sub="Clinic details, branches, hours and the content the website shows. Changes go live when you save."
         actions={
           <>
             {dirty && (
@@ -64,22 +65,13 @@ export default function SettingsPage() {
           </div>
         </Panel>
 
-        <Panel title="Contact">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Phone">
-              <input className="field" value={draft.phone} onChange={(e) => set('phone', e.target.value)} />
-            </Field>
-            <Field label="WhatsApp" hint="International format, digits only — e.g. 2010…">
+        <Panel title="WhatsApp & email">
+          <div className="space-y-4">
+            <Field label="Clinic WhatsApp" hint="Every booking and message from the website is sent here. International format, digits only, e.g. 2010…">
               <input className="field" inputMode="numeric" value={draft.whatsapp} onChange={(e) => set('whatsapp', e.target.value.replace(/\D/g, ''))} />
             </Field>
-            <Field label="Email" className="sm:col-span-2">
+            <Field label="Email">
               <input className="field" type="email" value={draft.email} onChange={(e) => set('email', e.target.value)} />
-            </Field>
-            <div className="sm:col-span-2">
-              <BilingualField label="Address" value={draft.address} onChange={(v) => set('address', v)} />
-            </div>
-            <Field label="Map search" hint="What Google Maps should search for the embedded map" className="sm:col-span-2">
-              <input className="field" value={draft.mapQuery} onChange={(e) => set('mapQuery', e.target.value)} />
             </Field>
           </div>
         </Panel>
@@ -118,29 +110,61 @@ export default function SettingsPage() {
           </ul>
         </Panel>
 
-        <Panel title="Online booking">
-          <div className="space-y-6">
-            <Toggle checked={draft.bookingOpen} onChange={(v) => set('bookingOpen', v)} label={draft.bookingOpen ? 'Patients can book on the website' : 'Online booking is paused'} />
-            <Field label="Appointment length" hint="Sets the slots offered on the booking page">
-              <div className="flex flex-wrap gap-2">
-                {[15, 20, 30, 45].map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    onClick={() => set('slotMinutes', m)}
-                    className={clsx('h-11 rounded-full px-5 text-sm font-semibold transition', draft.slotMinutes === m ? 'bg-navy text-white' : 'bg-blue-20 text-navy hover:bg-blue-40')}
-                  >
-                    {m} min
-                  </button>
-                ))}
-              </div>
-            </Field>
-            <div className="border-t border-navy/[0.06] pt-6">
-              <Toggle checked={draft.announcementOn} onChange={(v) => set('announcementOn', v)} label="Announcement bar" />
-              <div className={clsx('mt-4', !draft.announcementOn && 'opacity-50')}>
-                <BilingualField label="Announcement" value={draft.announcement} onChange={(v) => set('announcement', v)} />
-              </div>
+        <Panel title="Announcement bar">
+          <div className="space-y-4">
+            <Toggle checked={draft.announcementOn} onChange={(v) => set('announcementOn', v)} label={draft.announcementOn ? 'Shown on the website' : 'Hidden'} />
+            <div className={clsx(!draft.announcementOn && 'opacity-50')}>
+              <BilingualField label="Announcement" value={draft.announcement} onChange={(v) => set('announcement', v)} />
             </div>
+          </div>
+        </Panel>
+
+        <Panel
+          title="Branches"
+          className="xl:col-span-2"
+          action={
+            <button className="inline-flex h-9 items-center gap-1.5 rounded-full bg-blue-20 px-4 text-xs font-semibold text-navy hover:bg-blue-40" onClick={() => set('branches', [...draft.branches, { id: uid('br'), name: { en: '', ar: '' }, address: { en: '', ar: '' }, phones: [''], mapUrl: '' }])}>
+              <Plus size={14} /> Add branch
+            </button>
+          }
+        >
+          <p className="-mt-2 mb-5 text-xs text-deep">Each branch appears on the Contact page, in the footer and in the booking form. Patients pick their branch when they book.</p>
+          <div className="space-y-5">
+            {draft.branches.map((b, i) => (
+              <div key={b.id} className="space-y-4 rounded-2xl bg-mist p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-bold text-navy">Branch {i + 1}</p>
+                  {draft.branches.length > 1 && (
+                    <button onClick={() => confirm('Remove this branch?') && set('branches', draft.branches.filter((_, j) => j !== i))} className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-semibold text-rose-700 hover:bg-rose-50">
+                      <Trash2 size={14} /> Remove
+                    </button>
+                  )}
+                </div>
+                <BilingualField label="Branch name" value={b.name} onChange={(v) => setBranch(i, { name: v })} />
+                <BilingualField label="Address" value={b.address} onChange={(v) => setBranch(i, { address: v })} />
+                <Field label="Google Maps link" hint="In Google Maps: Share → Copy link, then paste it here">
+                  <input className="field" type="url" dir="ltr" placeholder="https://maps.app.goo.gl/…" value={b.mapUrl} onChange={(e) => setBranch(i, { mapUrl: e.target.value })} />
+                </Field>
+                <div>
+                  <span className="mb-1.5 block text-xs font-semibold tracking-wide text-deep uppercase">Phone numbers</span>
+                  <div className="space-y-2">
+                    {b.phones.map((ph, k) => (
+                      <div key={k} className="flex gap-2">
+                        <input className="field" dir="ltr" inputMode="tel" placeholder="010 0000 0000" value={ph} aria-label={`Branch ${i + 1} phone ${k + 1}`} onChange={(e) => setBranch(i, { phones: b.phones.map((x, m) => (m === k ? e.target.value : x)) })} />
+                        {b.phones.length > 1 && (
+                          <button onClick={() => setBranch(i, { phones: b.phones.filter((_, m) => m !== k) })} className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-rose-700 hover:bg-rose-50" aria-label="Remove number">
+                            <Trash2 size={15} />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={() => setBranch(i, { phones: [...b.phones, ''] })} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-semibold text-navy hover:bg-blue-20">
+                    <Plus size={14} /> Add number
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </Panel>
 
@@ -176,7 +200,7 @@ export default function SettingsPage() {
 
         <Panel title="Demo data" className="xl:col-span-2">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <p className="max-w-xl text-sm text-deep">Data lives in this browser until the dashboard is connected to a server. Resetting restores the sample services, articles, patients and appointments.</p>
+            <p className="max-w-xl text-sm text-deep">Data lives in this browser until the dashboard is connected to a server. Resetting restores the sample services, articles, reviews and settings.</p>
             <button
               className="inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-semibold text-rose-700 ring-1 ring-rose-200 hover:bg-rose-50"
               onClick={() => {

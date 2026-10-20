@@ -1,16 +1,16 @@
 import { useState, type FormEvent } from 'react'
 import clsx from 'clsx'
-import { Check, Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
+import { ArrowUpRight, Check, Mail, MapPin, Phone } from 'lucide-react'
 import { PageHero, Reveal } from '@/components/site/ui'
-import { uid, usePublicData, useStore } from '@/data/store'
+import { usePublicData } from '@/data/store'
 import { dayFromIndex, dayNames, formatTime, useI18n } from '@/lib/i18n'
 import { FaqSection } from './home/Sections'
-import { BookingSection } from '@/components/site/BookingRequest'
+import { BookingSection, WhatsAppIcon } from '@/components/site/BookingRequest'
+import { branchPhones, sendWhatsApp, telHref, waHref } from '@/lib/contact'
 
 export default function Contact() {
   const { t, tr, lang } = useI18n()
   const { settings } = usePublicData()
-  const { upsert } = useStore()
   const [form, setForm] = useState({ name: '', phone: '', email: '', message: '' })
   const [sent, setSent] = useState(false)
   const todayKey = dayFromIndex[new Date().getDay()]
@@ -18,57 +18,70 @@ export default function Contact() {
   function submit(e: FormEvent) {
     e.preventDefault()
     if (!form.name.trim() || !form.phone.trim() || !form.message.trim()) return
-    upsert('inquiries', {
-      id: uid('iq'),
-      name: form.name.trim(),
-      phone: form.phone.trim(),
-      email: form.email.trim() || undefined,
-      message: form.message.trim(),
-      createdAt: new Date().toISOString(),
-      read: false,
-    })
+    // nothing is stored: the message opens in WhatsApp, addressed to the clinic
+    sendWhatsApp(
+      settings.whatsapp,
+      [
+        `${t('contact.msgTitle')} — ${tr(settings.doctor.name)}`,
+        '',
+        `${t('req.msgName')}: ${form.name.trim()}`,
+        `${t('req.msgPhone')}: ${form.phone.trim()}`,
+        ...(form.email.trim() ? [`Email: ${form.email.trim()}`] : []),
+        '',
+        form.message.trim(),
+      ].join('\n'),
+    )
     setSent(true)
     setForm({ name: '', phone: '', email: '', message: '' })
   }
-
-  const channels = [
-    { Icon: Phone, label: t('cta.call'), value: settings.phone, href: `tel:${settings.phone.replace(/\s/g, '')}`, ltr: true },
-    { Icon: MessageCircle, label: t('cta.whatsapp'), value: `+${settings.whatsapp}`, href: `https://wa.me/${settings.whatsapp}`, ltr: true },
-    { Icon: Mail, label: 'Email', value: settings.email, href: `mailto:${settings.email}`, ltr: true },
-    { Icon: MapPin, label: t('contact.label'), value: tr(settings.address), href: `https://maps.google.com/?q=${encodeURIComponent(settings.mapQuery)}`, ltr: false },
-  ]
 
   return (
     <>
       <PageHero label={t('contact.label')} title={t('contact.title')} />
       <section className="pb-24">
         <div className="container-x grid gap-4 lg:grid-cols-12">
-          <div className="grid gap-4 sm:grid-cols-2 lg:col-span-7">
-            {channels.map(({ Icon, label, value, href, ltr }, i) => (
-              <Reveal key={label} delay={i * 0.06}>
+          <div className="grid content-start gap-4 sm:grid-cols-2 lg:col-span-7">
+            {settings.branches.map((b, i) => (
+              <Reveal key={b.id} delay={i * 0.06} className={settings.branches.length % 2 === 1 && i === settings.branches.length - 1 ? 'sm:col-span-2' : undefined}>
+                <div className="card flex h-full flex-col p-7">
+                  <span className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-20 text-navy">
+                    <MapPin size={22} strokeWidth={1.8} />
+                  </span>
+                  <p className="label mt-8">{settings.branches.length > 1 ? tr(b.name) : t('contact.label')}</p>
+                  <p className="mt-2 text-lg font-semibold text-navy">{tr(b.address)}</p>
+                  <div className="mt-5 space-y-2">
+                    {branchPhones(b).map((ph) => (
+                      <a key={ph} href={telHref(ph)} className="flex items-center gap-2 font-semibold text-navy hover:underline">
+                        <Phone size={16} strokeWidth={1.8} className="text-deep" /> <span dir="ltr">{ph}</span>
+                      </a>
+                    ))}
+                  </div>
+                  {b.mapUrl && (
+                    <div className="mt-auto pt-6">
+                      <a href={b.mapUrl} target="_blank" rel="noreferrer" className="btn-outline">
+                        {t('contact.map')} <ArrowUpRight size={15} className="rtl:-scale-x-100" />
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </Reveal>
+            ))}
+            {[
+              { Icon: WhatsAppIcon, label: t('cta.whatsapp'), value: `+${settings.whatsapp}`, href: waHref(settings.whatsapp) },
+              { Icon: Mail, label: 'Email', value: settings.email, href: `mailto:${settings.email}` },
+            ].map(({ Icon, label, value, href }, i) => (
+              <Reveal key={label} delay={0.1 + i * 0.06}>
                 <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noreferrer" className="group card flex h-full flex-col p-7 transition hover:-translate-y-1">
                   <span className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-20 text-navy transition group-hover:bg-navy group-hover:text-white">
-                    <Icon size={22} strokeWidth={1.8} />
+                    <Icon size={22} />
                   </span>
-                  <span className="label mt-10">{label}</span>
-                  <span className="mt-2 text-lg font-semibold break-words text-navy" dir={ltr ? 'ltr' : undefined}>
+                  <span className="label mt-8">{label}</span>
+                  <span className="mt-2 text-lg font-semibold break-words text-navy" dir="ltr">
                     {value}
                   </span>
                 </a>
               </Reveal>
             ))}
-
-            <Reveal className="sm:col-span-2">
-              <div className="overflow-hidden rounded-[28px] bg-white">
-                <iframe
-                  title="map"
-                  src={`https://www.google.com/maps?q=${encodeURIComponent(settings.mapQuery)}&output=embed`}
-                  className="h-80 w-full grayscale-[0.6]"
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
-              </div>
-            </Reveal>
           </div>
 
           <div className="space-y-4 lg:col-span-5">

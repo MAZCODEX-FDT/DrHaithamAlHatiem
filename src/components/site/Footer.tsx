@@ -4,6 +4,7 @@ import { ArrowUpRight, MapPin, Phone } from 'lucide-react'
 import { PulseLine, Wordmark } from '@/components/brand/Brand'
 import { usePublicData } from '@/data/store'
 import { dayNames, formatTime, useI18n } from '@/lib/i18n'
+import { branchPhones, telHref } from '@/lib/contact'
 
 export function Footer() {
   const { t, tr, lang } = useI18n()
@@ -61,17 +62,22 @@ export function Footer() {
           </div>
           <div>
             <p className="label mb-5">{t('nav.contact')}</p>
-            <ul className="space-y-4 text-sm text-white/80">
-              <li className="flex gap-3">
-                <Phone size={18} strokeWidth={1.8} className="mt-0.5 shrink-0 text-vessel" />
-                <a href={`tel:${settings.phone.replace(/\s/g, '')}`} dir="ltr" className="font-semibold text-white">
-                  {settings.phone}
-                </a>
-              </li>
-              <li className="flex gap-3">
-                <MapPin size={18} strokeWidth={1.8} className="mt-0.5 shrink-0 text-vessel" />
-                <span>{tr(settings.address)}</span>
-              </li>
+            <ul className="space-y-6 text-sm text-white/80">
+              {settings.branches.map((b) => (
+                <li key={b.id} className="space-y-2">
+                  {settings.branches.length > 1 && <p className="font-semibold text-white">{tr(b.name)}</p>}
+                  <a href={b.mapUrl || undefined} target="_blank" rel="noreferrer" className="flex gap-3 hover:text-white">
+                    <MapPin size={18} strokeWidth={1.8} className="mt-0.5 shrink-0 text-vessel" />
+                    <span>{tr(b.address)}</span>
+                  </a>
+                  {branchPhones(b).map((ph) => (
+                    <a key={ph} href={telHref(ph)} className="flex gap-3 font-semibold text-white">
+                      <Phone size={18} strokeWidth={1.8} className="mt-0.5 shrink-0 text-vessel" />
+                      <span dir="ltr">{ph}</span>
+                    </a>
+                  ))}
+                </li>
+              ))}
             </ul>
             <Link to="/book" className="btn mt-7 bg-white text-navy hover:bg-mist">
               {t('cta.book')}

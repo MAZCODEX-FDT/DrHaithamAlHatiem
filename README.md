@@ -2,7 +2,7 @@
 
 Bilingual (English / Arabic) website and clinic dashboard for Dr. Haitham AlHatiem, consultant vascular surgeon (FRCS, UK).
 
-**Stack:** Vite · React 19 · TypeScript · Tailwind CSS v4 · GSAP + ScrollTrigger · Lenis smooth scroll · React Bits · Motion · Recharts
+**Stack:** Vite · React 19 · TypeScript · Tailwind CSS v4 · GSAP + ScrollTrigger · Lenis smooth scroll · React Bits · Motion
 
 ## Run it
 
@@ -22,22 +22,34 @@ npm run lint     # oxlint
 | `/about` | Doctor profile and credentials |
 | `/services`, `/services/:slug` | All services and one page per condition or procedure |
 | `/guide`, `/guide/:slug` | Patient guide (health tips) |
-| `/book` | 3-step booking: service → date & time (from clinic hours) → details |
-| `/contact` | Contact form, map and hours |
+| `/book` | Appointment request form |
+| `/contact` | Branches (address, phone numbers, Google Maps link), hours, question form |
 
 The language switch flips the whole site to Arabic and RTL (IBM Plex Sans Arabic). English uses Manrope.
 
-### Dashboard (`/dashboard`)
-Overview (KPIs, visits chart, case mix, today's schedule) · Appointments (list, week view, CSV export) · Patients (records with ABI, CEAP and risk factors) · Inquiries · Vascular tools (ABI calculator, Wells DVT score, CEAP reference) · Services, Health tips and Reviews CMS · Settings (profile, contact, hours, booking, homepage figures).
+### Booking: WhatsApp only
+Every booking and message goes to the clinic's WhatsApp. That covers the floating **Book** button, the request section on the home, contact and service pages, `/book`, and the contact form. When the patient presses **Send**, WhatsApp opens with their name, phone, branch, service, preferred day and time and notes already written, addressed to the clinic number. The patient sends it from their own WhatsApp. **The website stores no patient data.**
 
-Bookings and contact messages from the website appear in the dashboard straight away. Content edited in the dashboard shows on the website.
+Floating **WhatsApp** and **Call** buttons sit on every page. With more than one phone number, Call lists every branch's numbers.
+
+### Dashboard (`/dashboard`)
+The dashboard manages website content only:
+- **Overview:** content summary, where bookings go, branches at a glance.
+- **Services, Health tips, Reviews:** edit what the site shows.
+- **Settings:**
+  - doctor profile;
+  - clinic WhatsApp (receives all bookings) and email;
+  - **branches**: any number, each with a name, an address, several phone numbers and a Google Maps link;
+  - hours, social links, announcement bar and homepage figures.
+
+There are no patient, appointment or treatment records.
 
 ## Before going live
 
-- **Data is stored in the browser only** (`localStorage`, see `src/data/store.tsx`). Every read and write goes through `useStore()`, so moving to a real backend means replacing `load`/`save` and the mutation functions with API calls.
-- **The dashboard login is a front-end demo gate** (`src/pages/dashboard/DashboardApp.tsx`, password `vascular2026`). It is not security. Production needs server-side authentication. Patient records are health data and must sit behind real auth on a server.
+- **Website content is stored in the browser only** (`localStorage`, see `src/data/store.tsx`), so dashboard edits are visible only on the device that made them. To publish edits for every visitor, either put the content behind a small API (replace `load`/`save` in `useStore()`), or edit the defaults in `src/data/seed.ts` and redeploy.
+- **The dashboard login is a front-end demo gate** (`src/pages/dashboard/DashboardApp.tsx`, password `vascular2026`). It is not security: anyone reading the page source can find it. Production needs server-side authentication.
 - **Clinic photos are placeholders.** Replace `public/brand/consultation-room.jpg`, `waiting-area.jpg` and `credentials-wall.jpg` with real photos at the same names.
-- **Fill in real details** in Dashboard → Settings, or in `src/data/seed.ts`: clinic address, map location and social links (currently generic).
+- **Fill in real details** in `src/data/seed.ts` (or Dashboard → Settings): branches with addresses, phone numbers and Google Maps links, the clinic WhatsApp number, and social links. These are currently placeholders.
 
 ## Brand
 

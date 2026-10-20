@@ -9,6 +9,7 @@ import Magnet from '@/components/reactbits/Magnet'
 import { FineRule } from '@/components/brand/Brand'
 import { usePublicData } from '@/data/store'
 import { useI18n } from '@/lib/i18n'
+import { primaryPhone, telHref } from '@/lib/contact'
 import { gsap, useReducedMotion } from '@/lib/smooth'
 import { withBase } from '@/lib/base'
 
@@ -108,10 +109,12 @@ export function Hero({ ready }: { ready: boolean }) {
                 <ArrowUpRight size={18} className="rtl:-scale-x-100" />
               </Link>
             </Magnet>
-            <a href={`tel:${settings.phone.replace(/\s/g, '')}`} className="btn-ghost-light h-14 px-7 text-base">
-              <Phone size={17} strokeWidth={1.8} />
-              <span dir="ltr">{settings.phone}</span>
-            </a>
+            {primaryPhone(settings) && (
+              <a href={telHref(primaryPhone(settings))} className="btn-ghost-light h-14 px-7 text-base">
+                <Phone size={17} strokeWidth={1.8} />
+                <span dir="ltr">{primaryPhone(settings)}</span>
+              </a>
+            )}
           </div>
 
           <div className="hero-fade mt-12 flex flex-wrap items-center gap-x-3 gap-y-2 text-white/70">
