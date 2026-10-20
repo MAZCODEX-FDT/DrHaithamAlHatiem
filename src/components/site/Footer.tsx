@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { SVGProps } from 'react'
 import { ArrowUpRight, MapPin, Phone } from 'lucide-react'
-import { ArabicLockup, PulseLine, Wordmark } from '@/components/brand/Brand'
+import { PulseLine, Wordmark } from '@/components/brand/Brand'
 import { usePublicData } from '@/data/store'
 import { dayNames, formatTime, useI18n } from '@/lib/i18n'
 
@@ -17,7 +17,6 @@ export function Footer() {
       <div className="container-x relative grid gap-12 pt-10 pb-12 lg:grid-cols-12">
         <div className="lg:col-span-5">
           <Wordmark tone="white" className="w-full max-w-[380px]" />
-          <ArabicLockup tone="white" className="mt-8 w-fit text-[15px]" />
           <p className="mt-8 max-w-sm text-sm leading-relaxed text-white/70">{tr(settings.doctor.credentials)}</p>
           <div className="mt-6 flex gap-2">
             {[

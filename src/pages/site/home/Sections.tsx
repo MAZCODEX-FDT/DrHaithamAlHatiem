@@ -411,8 +411,10 @@ export function CtaBand() {
         <VesselTree className="absolute -bottom-24 left-1/2 -z-10 h-[560px] -translate-x-1/2 opacity-30" color="#8DAFBC" strokeWidth={8} />
         <PulseLine className="absolute inset-x-0 top-1/2 -z-10 h-28 -translate-y-1/2 opacity-30" strokeWidth={1.4} pulseAt={0.5} />
         <p className="label">{t('hero.eyebrow')}</p>
-        <h2 className="mx-auto mt-6 max-w-4xl text-[clamp(2.4rem,6vw,5.4rem)] leading-[1] font-bold tracking-tight">
-          <ShinyText key={lang} text={t('hero.title1') + ' ' + t('hero.title2')} color="#ffffff" shineColor="#8DAFBC" speed={4} />
+        <h2 className={clsx('mx-auto mt-6 max-w-4xl font-bold', lang === 'ar' ? 'text-[clamp(2rem,4.6vw,4.2rem)] leading-[1.3]' : 'text-[clamp(2.4rem,6vw,5.4rem)] leading-[1] tracking-tight')}>
+          {/* one ShinyText per phrase (each an inline-block), so wrapping only ever happens between them */}
+          <ShinyText key={lang + '1'} text={t('hero.title1')} color="#ffffff" shineColor="#8DAFBC" speed={4} />{' '}
+          <ShinyText key={lang + '2'} text={t('hero.title2')} color="#ffffff" shineColor="#8DAFBC" speed={4} />
         </h2>
         <FineRule className="mx-auto mt-8 w-48 text-white/70" />
         <div className="mt-10 flex flex-wrap justify-center gap-3">

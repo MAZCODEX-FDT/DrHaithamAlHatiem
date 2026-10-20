@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useGSAP } from '@gsap/react'
@@ -28,6 +29,7 @@ function useIsDesktop() {
 export function Hero({ ready }: { ready: boolean }) {
   const ref = useRef<HTMLElement>(null)
   const { t, tr, lang } = useI18n()
+  const heroLeading = lang === 'ar' ? 'leading-[1.2]!' : 'leading-[0.95]!'
   const { services, settings } = usePublicData()
   const reduced = useReducedMotion()
   const desktop = useIsDesktop()
@@ -87,11 +89,13 @@ export function Hero({ ready }: { ready: boolean }) {
           <h1 className="sr-only">
             {t('hero.title1')} {t('hero.title2')}
           </h1>
-          <div aria-hidden className="mt-7 font-bold tracking-[-0.035em]">
+          {/* Arabic glyphs run wider and taller than Latin: a smaller size keeps each line on one row.
+              Leading goes on the BlurText <p>s themselves, since the Arabic body-text rule sets p line-height. */}
+          <div aria-hidden className={clsx('mt-7 font-bold', lang === 'ar' ? 'text-[clamp(2.4rem,5.4vw,5rem)]' : 'text-[clamp(3rem,8.4vw,7.6rem)] tracking-[-0.035em]')}>
             {ready && (
               <>
-                <BlurText key={lang + '1'} text={t('hero.title1')} animateBy="words" delay={120} stepDuration={0.45} trigger="load" className="text-[clamp(3rem,8.4vw,7.6rem)] leading-[0.95]" />
-                <BlurText key={lang + '2'} text={t('hero.title2')} animateBy="words" delay={120} stepDuration={0.45} trigger="load" className="text-[clamp(3rem,8.4vw,7.6rem)] leading-[0.95] text-vessel" />
+                <BlurText key={lang + '1'} text={t('hero.title1')} animateBy="words" delay={120} stepDuration={0.45} trigger="load" className={heroLeading} />
+                <BlurText key={lang + '2'} text={t('hero.title2')} animateBy="words" delay={120} stepDuration={0.45} trigger="load" className={clsx(heroLeading, 'text-vessel')} />
               </>
             )}
           </div>
