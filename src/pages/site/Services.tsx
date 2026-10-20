@@ -7,6 +7,7 @@ import { usePublicData } from '@/data/store'
 import { useI18n } from '@/lib/i18n'
 import { CtaBand, FaqSection } from './home/Sections'
 import NotFound from './NotFound'
+import { BookingSection } from '@/components/site/BookingRequest'
 
 export function ServicesPage() {
   const { t } = useI18n()
@@ -118,6 +119,8 @@ export function ServiceDetail() {
           </div>
         </div>
       </section>
+
+      <BookingSection serviceId={service.id} className="pt-0! sm:pt-0!" />
 
       <section className="pb-24">
         <div className="container-x">

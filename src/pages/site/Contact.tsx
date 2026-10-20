@@ -5,6 +5,7 @@ import { PageHero, Reveal } from '@/components/site/ui'
 import { uid, usePublicData, useStore } from '@/data/store'
 import { dayFromIndex, dayNames, formatTime, useI18n } from '@/lib/i18n'
 import { FaqSection } from './home/Sections'
+import { BookingSection } from '@/components/site/BookingRequest'
 
 export default function Contact() {
   const { t, tr, lang } = useI18n()
@@ -108,6 +109,7 @@ export default function Contact() {
           </div>
         </div>
       </section>
+      <BookingSection className="pt-0! sm:pt-0!" />
       <FaqSection />
     </>
   )
