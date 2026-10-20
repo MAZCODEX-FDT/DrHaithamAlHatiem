@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import clsx from 'clsx'
 import { ArrowLeft, ArrowUpRight } from 'lucide-react'
 import { FineRule, PulseLine } from '@/components/brand/Brand'
 import { MaskHeading, PageHero, Reveal } from '@/components/site/ui'
@@ -10,12 +12,32 @@ import NotFound from './NotFound'
 export function GuidePage() {
   const { t, tr, lang } = useI18n()
   const { tips } = usePublicData()
-  const [lead, ...rest] = tips
+  // categories in order of first appearance, keyed by their English name
+  const categories = [...new Map(tips.map((tip) => [tip.category.en, tip.category])).values()]
+  const [topic, setTopic] = useState<string | null>(null)
+  const shown = topic ? tips.filter((tip) => tip.category.en === topic) : tips
+  // the large featured card only leads the unfiltered list
+  const lead = topic ? undefined : shown[0]
+  const rest = topic ? shown : shown.slice(1)
   return (
     <>
       <PageHero label={t('tips.label')} title={t('tips.title')} />
       <section className="pb-24">
         <div className="container-x space-y-4">
+          {categories.length > 1 && (
+            <div className="no-scrollbar -mx-5 mb-6 flex gap-2 overflow-x-auto px-5 sm:mx-0 sm:flex-wrap sm:px-0" role="group" aria-label={t('tips.label')}>
+              {[{ key: null, label: t('tips.all') }, ...categories.map((c) => ({ key: c.en, label: tr(c) }))].map(({ key, label }) => (
+                <button
+                  key={key ?? 'all'}
+                  onClick={() => setTopic(key)}
+                  aria-pressed={topic === key}
+                  className={clsx('h-11 shrink-0 rounded-full px-5 text-sm font-semibold whitespace-nowrap transition', topic === key ? 'bg-navy text-white' : 'bg-white text-navy ring-1 ring-navy/10 hover:bg-blue-20')}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
           {lead && (
             <Reveal>
               <Link to={`/guide/${lead.slug}`} className="group on-navy relative grid overflow-hidden rounded-[32px] bg-navy p-8 text-white sm:p-12 lg:grid-cols-2 lg:gap-12">
@@ -40,7 +62,7 @@ export function GuidePage() {
           )}
           <div className="grid gap-4 md:grid-cols-3">
             {rest.map((tip, i) => (
-              <Reveal key={tip.id} delay={i * 0.07}>
+              <Reveal key={tip.id} delay={(i % 3) * 0.07}>
                 <Link to={`/guide/${tip.slug}`} className="group card flex h-full flex-col p-8 transition hover:-translate-y-1">
                   <span className="w-fit rounded-full bg-blue-20 px-3 py-1.5 text-xs font-semibold text-navy">{tr(tip.category)}</span>
                   <h3 className="mt-8 text-2xl leading-tight font-semibold tracking-tight text-navy">{tr(tip.title)}</h3>
