@@ -1,18 +1,4 @@
-import type {
-  Appointment,
-  AppointmentSource,
-  AppointmentStatus,
-  AppointmentType,
-  Condition,
-  DB,
-  Faq,
-  Inquiry,
-  Patient,
-  Review,
-  Service,
-  Settings,
-  Tip,
-} from './types'
+import type { DB, Faq, Review, Service, Settings, Tip } from './types'
 
 /* ───────────────────────── Services ───────────────────────── */
 
@@ -522,11 +508,18 @@ export const settings: Settings = {
       ar: 'د. هيثم الحطيم استشاري جراحة الأوعية الدموية وزميل كلية الجراحين الملكية البريطانية. تشمل ممارسته أمراض الأوردة والشرايين بكافة أنواعها — من الدوالي والقدم السكري إلى الإصلاح بالقسطرة بأقل تدخل جراحي. يعرفه مرضاه بثلاثة أشياء: يشرح بوضوح، ويعالج بدقة، ويتابع بنفسه.',
     },
   },
-  phone: '010 6093 4438',
   whatsapp: '201060934438',
   email: 'clinic@drhaithamalhatiem.com',
-  address: { en: 'Clinic address, Cairo, Egypt', ar: 'عنوان العيادة، القاهرة، مصر' },
-  mapQuery: 'Cairo, Egypt',
+  // placeholders until the real branches are entered in Dashboard → Settings
+  branches: [
+    {
+      id: 'br-1',
+      name: { en: 'Main clinic', ar: 'العيادة الرئيسية' },
+      address: { en: 'Clinic address, Cairo, Egypt', ar: 'عنوان العيادة، القاهرة، مصر' },
+      phones: ['010 6093 4438'],
+      mapUrl: 'https://maps.google.com/?q=Cairo%2C%20Egypt',
+    },
+  ],
   hours: [
     { day: 'sat', open: '17:00', close: '22:00', closed: false },
     { day: 'sun', open: '17:00', close: '22:00', closed: false },
@@ -536,7 +529,6 @@ export const settings: Settings = {
     { day: 'thu', open: '17:00', close: '20:00', closed: false, byAppointment: true },
     { day: 'fri', open: '00:00', close: '00:00', closed: true },
   ],
-  slotMinutes: 20,
   stats: [
     { id: 'st-1', value: 15, suffix: '+', label: { en: 'Years in vascular surgery', ar: 'عاماً في جراحة الأوعية' } },
     { id: 'st-2', value: 15, suffix: ' min', label: { en: 'Doppler scan, same visit', ar: 'دقيقة لفحص الدوبلر' } },
@@ -553,17 +545,6 @@ export const settings: Settings = {
     ar: 'جديد: فحص الدوبلر في نفس الزيارة كل أيام العيادة.',
   },
   announcementOn: true,
-  bookingOpen: true,
-}
-
-/* ───────────────── Generated clinical data (relative to today) ───────────────── */
-
-// Deterministic PRNG so the demo looks the same on every first load
-function rng(seed: number) {
-  return () => {
-    seed = (seed * 1664525 + 1013904223) % 4294967296
-    return seed / 4294967296
-  }
 }
 
 export function iso(d: Date) {
@@ -573,136 +554,6 @@ export function iso(d: Date) {
   return `${y}-${m}-${day}`
 }
 
-const FIRST_M = ['Ahmed', 'Mohamed', 'Mahmoud', 'Omar', 'Khaled', 'Youssef', 'Tarek', 'Hassan', 'Mostafa', 'Ibrahim', 'Karim', 'Sherif', 'Adel', 'Samir']
-const FIRST_F = ['Mona', 'Sara', 'Nour', 'Heba', 'Rania', 'Dina', 'Yasmin', 'Mariam', 'Hala', 'Amal', 'Laila', 'Salma']
-const LAST = ['Hassan', 'Mansour', 'El-Sayed', 'Farouk', 'Nabil', 'Fahmy', 'Ragab', 'Saleh', 'Osman', 'Kamel', 'Zaki', 'Hamdy', 'Shawky', 'Fouad']
-
-const conditionByService: Record<string, Condition> = {
-  'svc-varicose': 'Varicose veins',
-  'svc-arterial': 'Peripheral arterial disease',
-  'svc-diabetic': 'Diabetic foot',
-  'svc-endovascular': 'Peripheral arterial disease',
-  'svc-dialysis': 'Dialysis access',
-  'svc-dvt': 'Deep vein thrombosis',
-  'svc-aneurysm': 'Aortic aneurysm',
-  'svc-doppler': 'Varicose veins',
-}
-
-export function generateClinical(today = new Date()) {
-  const r = rng(20260420)
-  const pick = <T,>(a: T[]) => a[Math.floor(r() * a.length)]
-  const serviceWeights = [
-    ['svc-varicose', 30],
-    ['svc-arterial', 16],
-    ['svc-diabetic', 14],
-    ['svc-doppler', 16],
-    ['svc-endovascular', 8],
-    ['svc-dialysis', 7],
-    ['svc-dvt', 6],
-    ['svc-aneurysm', 3],
-  ] as const
-  const totalW = serviceWeights.reduce((s, [, w]) => s + w, 0)
-  const pickService = () => {
-    let x = r() * totalW
-    for (const [id, w] of serviceWeights) {
-      x -= w
-      if (x <= 0) return id
-    }
-    return 'svc-varicose'
-  }
-
-  const patients: Patient[] = []
-  for (let i = 0; i < 64; i++) {
-    const female = r() < 0.48
-    const name = `${pick(female ? FIRST_F : FIRST_M)} ${pick(LAST)}`
-    const svc = pickService()
-    const cond = conditionByService[svc]
-    const age = 28 + Math.floor(r() * 50)
-    const dob = new Date(today.getFullYear() - age, Math.floor(r() * 12), 1 + Math.floor(r() * 27))
-    const arterial = cond === 'Peripheral arterial disease' || cond === 'Diabetic foot'
-    const created = new Date(today)
-    created.setDate(created.getDate() - Math.floor(r() * 220) - 5)
-    const follow = new Date(today)
-    follow.setDate(follow.getDate() + Math.floor(r() * 40) - 8)
-    patients.push({
-      id: `pt-${String(i + 1).padStart(3, '0')}`,
-      name,
-      phone: `01${pick(['0', '1', '2', '5'])} ${String(1000 + Math.floor(r() * 8999))} ${String(1000 + Math.floor(r() * 8999))}`,
-      email: r() < 0.6 ? `${name.split(' ')[0].toLowerCase()}.${Math.floor(r() * 90 + 10)}@mail.com` : undefined,
-      gender: female ? 'female' : 'male',
-      dob: iso(dob),
-      conditions: r() < 0.2 ? [cond, pick(['Venous ulcer', 'Carotid disease', 'Lymphoedema'] as Condition[])] : [cond],
-      abiLeft: arterial ? +(0.45 + r() * 0.5).toFixed(2) : +(0.98 + r() * 0.2).toFixed(2),
-      abiRight: arterial ? +(0.5 + r() * 0.5).toFixed(2) : +(0.98 + r() * 0.2).toFixed(2),
-      ceap: cond === 'Varicose veins' ? ['C1', 'C2', 'C3', 'C4a', 'C5'][Math.floor(r() * 5)] : undefined,
-      diabetic: cond === 'Diabetic foot' || r() < 0.22,
-      smoker: r() < (arterial ? 0.55 : 0.2),
-      notes: '',
-      followUp: r() < 0.7 ? iso(follow) : undefined,
-      createdAt: iso(created),
-    })
-  }
-
-  const times: string[] = []
-  for (let h = 17; h < 22; h++) for (const m of ['00', '20', '40']) times.push(`${h}:${m}`)
-
-  const appointments: Appointment[] = []
-  let n = 1
-  for (let off = -75; off <= 21; off++) {
-    const d = new Date(today)
-    d.setDate(d.getDate() + off)
-    if (d.getDay() === 5) continue // Friday closed
-    const isThu = d.getDay() === 4
-    const count = isThu ? 2 + Math.floor(r() * 3) : 5 + Math.floor(r() * 7) - (off > 0 ? Math.floor(off / 3) : 0)
-    const used = new Set<string>()
-    for (let k = 0; k < Math.max(count, 0); k++) {
-      let time = pick(times)
-      while (used.has(time)) time = pick(times)
-      used.add(time)
-      const pt = pick(patients)
-      const svc = pickService()
-      const type: AppointmentType = svc === 'svc-doppler' ? 'doppler' : r() < 0.38 ? 'follow-up' : r() < 0.12 ? 'procedure' : 'consultation'
-      let status: AppointmentStatus
-      if (off < 0) status = r() < 0.86 ? 'completed' : r() < 0.5 ? 'no-show' : 'cancelled'
-      else if (off === 0) status = r() < 0.4 ? 'completed' : 'confirmed'
-      else status = r() < 0.65 ? 'confirmed' : 'pending'
-      const source: AppointmentSource = pick(['website', 'website', 'website', 'phone', 'phone', 'whatsapp', 'walk-in'])
-      const created = new Date(d)
-      created.setDate(created.getDate() - 1 - Math.floor(r() * 10))
-      appointments.push({
-        id: `ap-${String(n++).padStart(4, '0')}`,
-        patientId: pt.id,
-        name: pt.name,
-        phone: pt.phone,
-        email: pt.email,
-        serviceId: svc,
-        type,
-        date: iso(d),
-        time,
-        status,
-        source,
-        createdAt: created.toISOString(),
-      })
-    }
-  }
-
-  const inquiries: Inquiry[] = [
-    { id: 'iq-1', name: 'Nour Hamdy', phone: '010 2231 7781', message: 'Is the Doppler scan available on Thursday? My mother has swelling in one leg since yesterday.', createdAt: new Date(today.getTime() - 3.6e6 * 3).toISOString(), read: false },
-    { id: 'iq-2', name: 'محمد فؤاد', phone: '011 4410 9932', message: 'أريد الاستفسار عن علاج الدوالي بالليزر ومدة الراحة بعد الإجراء.', createdAt: new Date(today.getTime() - 3.6e6 * 20).toISOString(), read: false },
-    { id: 'iq-3', name: 'Tarek Zaki', phone: '012 8890 1123', email: 'tarek.z@mail.com', message: 'Do you accept patients referred from a nephrologist for fistula creation?', createdAt: new Date(today.getTime() - 3.6e6 * 50).toISOString(), read: true },
-  ]
-
-  return { patients, appointments, inquiries }
-}
-
 export function createSeed(): DB {
-  const clinical = generateClinical()
-  return {
-    services,
-    tips,
-    reviews,
-    faqs,
-    settings,
-    ...clinical,
-  }
+  return { services, tips, reviews, faqs, settings }
 }

@@ -2,37 +2,15 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { Link, Navigate, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { useGSAP } from '@gsap/react'
 import clsx from 'clsx'
-import {
-  Activity,
-  Bell,
-  CalendarDays,
-  ExternalLink,
-  FileText,
-  HeartPulse,
-  Inbox,
-  LayoutDashboard,
-  LogOut,
-  Menu,
-  Search,
-  Settings as SettingsIcon,
-  Star,
-  Stethoscope,
-  Users,
-  X,
-} from 'lucide-react'
+import { Bell, ExternalLink, FileText, LayoutDashboard, LogOut, Menu, Settings as SettingsIcon, Star, Stethoscope, X } from 'lucide-react'
 import { PulseLine, Wordmark } from '@/components/brand/Brand'
 import { useStore } from '@/data/store'
-import { iso } from '@/data/seed'
 import { gsap } from '@/lib/smooth'
 import Overview from './Overview'
-import Appointments from './Appointments'
-import Patients, { PatientDetail } from './Patients'
 import ServicesCms from './ServicesCms'
 import TipsCms from './TipsCms'
 import ReviewsPage from './Reviews'
-import Inquiries from './Inquiries'
 import SettingsPage from './Settings'
-import Tools from './Tools'
 import { withBase } from '@/lib/base'
 
 /**
@@ -150,15 +128,10 @@ function Login({ onLogin }: { onLogin: () => void }) {
   )
 }
 
+// The dashboard manages website content only: bookings and messages go straight to the clinic's WhatsApp
 const nav = [
-  { group: 'Clinic', items: [
-    { to: '', label: 'Overview', Icon: LayoutDashboard },
-    { to: 'appointments', label: 'Appointments', Icon: CalendarDays, badge: 'pending' as const },
-    { to: 'patients', label: 'Patients', Icon: Users },
-    { to: 'inquiries', label: 'Inquiries', Icon: Inbox, badge: 'inquiries' as const },
-    { to: 'tools', label: 'Vascular tools', Icon: Activity },
-  ] },
   { group: 'Website', items: [
+    { to: '', label: 'Overview', Icon: LayoutDashboard },
     { to: 'services', label: 'Services', Icon: Stethoscope },
     { to: 'tips', label: 'Health tips', Icon: FileText },
     { to: 'reviews', label: 'Reviews', Icon: Star, badge: 'reviews' as const },
@@ -172,14 +145,7 @@ function Shell({ onLogout }: { onLogout: () => void }) {
   const { pathname } = useLocation()
   useEffect(() => setMobile(false), [pathname])
 
-  const counts = useMemo(
-    () => ({
-      pending: db.appointments.filter((a) => a.status === 'pending').length,
-      inquiries: db.inquiries.filter((i) => !i.read).length,
-      reviews: db.reviews.filter((r) => r.status === 'pending').length,
-    }),
-    [db],
-  )
+  const counts = useMemo(() => ({ reviews: db.reviews.filter((r) => r.status === 'pending').length }), [db])
 
   const sidebar = (
     <div className="flex h-full flex-col">
@@ -251,11 +217,6 @@ function Shell({ onLogout }: { onLogout: () => void }) {
         <main className="mx-auto max-w-[1400px] px-4 pt-6 pb-16 sm:px-8">
           <Routes>
             <Route index element={<Overview />} />
-            <Route path="appointments" element={<Appointments />} />
-            <Route path="patients" element={<Patients />} />
-            <Route path="patients/:id" element={<PatientDetail />} />
-            <Route path="inquiries" element={<Inquiries />} />
-            <Route path="tools" element={<Tools />} />
             <Route path="services" element={<ServicesCms />} />
             <Route path="tips" element={<TipsCms />} />
             <Route path="reviews" element={<ReviewsPage />} />
@@ -268,88 +229,26 @@ function Shell({ onLogout }: { onLogout: () => void }) {
   )
 }
 
-function Topbar({ onMenu, counts }: { onMenu: () => void; counts: { pending: number; inquiries: number; reviews: number } }) {
-  const { db } = useStore()
+function Topbar({ onMenu, counts }: { onMenu: () => void; counts: { reviews: number } }) {
   const navigate = useNavigate()
-  const [q, setQ] = useState('')
-  const [focus, setFocus] = useState(false)
-  const [bell, setBell] = useState(false)
-  const total = counts.pending + counts.inquiries + counts.reviews
-
-  const results = useMemo(() => {
-    const s = q.trim().toLowerCase()
-    if (s.length < 2) return []
-    return db.patients.filter((p) => p.name.toLowerCase().includes(s) || p.phone.replace(/\s/g, '').includes(s.replace(/\s/g, ''))).slice(0, 6)
-  }, [q, db.patients])
-
-  const todayCount = db.appointments.filter((a) => a.date === iso(new Date()) && a.status !== 'cancelled').length
-
   return (
     <header className="sticky top-0 z-20 border-b border-navy/[0.06] bg-mist/80 backdrop-blur-xl">
       <div className="mx-auto flex h-[72px] max-w-[1400px] items-center gap-3 px-4 sm:px-8">
         <button onClick={onMenu} className="grid h-11 w-11 place-items-center rounded-full text-navy hover:bg-white lg:hidden" aria-label="Open menu">
           <Menu size={20} />
         </button>
-        <div className="relative max-w-md flex-1">
-          <Search size={17} className="absolute top-1/2 left-4 -translate-y-1/2 text-deep" />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            onFocus={() => setFocus(true)}
-            onBlur={() => setTimeout(() => setFocus(false), 150)}
-            placeholder="Search patients by name or phone…"
-            className="h-11 w-full rounded-full bg-white pr-4 pl-11 text-sm ring-1 ring-navy/[0.06] outline-none focus:ring-2 focus:ring-navy/30"
-          />
-          {focus && results.length > 0 && (
-            <ul className="absolute inset-x-0 top-full mt-2 overflow-hidden rounded-2xl bg-white p-1.5 shadow-xl ring-1 ring-navy/10">
-              {results.map((p) => (
-                <li key={p.id}>
-                  <button
-                    onMouseDown={() => {
-                      navigate(`/dashboard/patients/${p.id}`)
-                      setQ('')
-                    }}
-                    className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm hover:bg-blue-20"
-                  >
-                    <span className="font-medium text-navy">{p.name}</span>
-                    <span className="text-xs text-deep">{p.conditions[0]}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-        <div className="ml-auto hidden items-center gap-2 rounded-full bg-white px-4 py-2 text-sm text-navy ring-1 ring-navy/[0.06] md:flex">
-          <HeartPulse size={16} strokeWidth={1.8} className="text-vessel" />
-          <span className="font-semibold tabular-nums">{todayCount}</span> patients today
-        </div>
-        <div className="relative">
-          <button onClick={() => setBell((b) => !b)} className="relative grid h-11 w-11 place-items-center rounded-full bg-white text-navy ring-1 ring-navy/[0.06]" aria-label="Notifications">
-            <Bell size={18} strokeWidth={1.8} />
-            {total > 0 && <span className="absolute -top-0.5 -right-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-navy px-1 text-[10px] font-bold text-white">{total}</span>}
-          </button>
-          {bell && (
-            <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white p-2 shadow-xl ring-1 ring-navy/10">
-              {[
-                { n: counts.pending, label: 'appointment requests to confirm', to: '/dashboard/appointments' },
-                { n: counts.inquiries, label: 'unread inquiries', to: '/dashboard/inquiries' },
-                { n: counts.reviews, label: 'reviews awaiting approval', to: '/dashboard/reviews' },
-              ].map((x) => (
-                <button
-                  key={x.to}
-                  onClick={() => {
-                    navigate(x.to)
-                    setBell(false)
-                  }}
-                  className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm hover:bg-blue-20"
-                >
-                  <span className="grid h-8 w-8 place-items-center rounded-full bg-blue-20 font-bold text-navy tabular-nums">{x.n}</span>
-                  <span className="text-ink/80">{x.label}</span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        <a href={withBase('/')} target="_blank" className="ml-auto inline-flex h-11 items-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-navy ring-1 ring-navy/[0.06] hover:bg-blue-20">
+          <ExternalLink size={16} strokeWidth={1.8} /> View website
+        </a>
+        <button
+          onClick={() => navigate('/dashboard/reviews')}
+          className="relative grid h-11 w-11 place-items-center rounded-full bg-white text-navy ring-1 ring-navy/[0.06]"
+          aria-label={`${counts.reviews} reviews awaiting approval`}
+          title="Reviews awaiting approval"
+        >
+          <Bell size={18} strokeWidth={1.8} />
+          {counts.reviews > 0 && <span className="absolute -top-0.5 -right-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-navy px-1 text-[10px] font-bold text-white">{counts.reviews}</span>}
+        </button>
       </div>
     </header>
   )

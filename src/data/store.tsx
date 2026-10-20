@@ -16,12 +16,34 @@ const SEEN_TIPS_KEY = 'dha:seen-tips'
 function load(): DB {
   try {
     const raw = localStorage.getItem(KEY)
-    if (raw) return addNewSeedTips(JSON.parse(raw) as DB)
+    if (raw) return addNewSeedTips(migrate(JSON.parse(raw)))
   } catch {
     /* storage unavailable or corrupt — fall back to seed */
   }
   const db = createSeed()
   rememberSeedTips(db.tips.map((t) => t.id))
+  return db
+}
+
+/** Saved data from before branches: the clinic records are dropped and the single phone/address becomes the first branch */
+function migrate(saved: DB & Record<string, unknown>): DB {
+  const { appointments: _a, patients: _p, inquiries: _i, ...db } = saved
+  const old = db.settings as DB['settings'] & { phone?: string; address?: DB['settings']['branches'][number]['address']; mapQuery?: string; slotMinutes?: number; bookingOpen?: boolean }
+  if (!Array.isArray(old.branches)) {
+    const { phone, address, mapQuery, slotMinutes: _s, bookingOpen: _b, ...rest } = old
+    const seed = createSeed().settings.branches[0]
+    db.settings = {
+      ...rest,
+      branches: [
+        {
+          ...seed,
+          address: address ?? seed.address,
+          phones: phone ? [phone] : seed.phones,
+          mapUrl: mapQuery ? `https://maps.google.com/?q=${encodeURIComponent(mapQuery)}` : seed.mapUrl,
+        },
+      ],
+    }
+  }
   return db
 }
 

@@ -8,6 +8,7 @@ import { Wordmark } from '@/components/brand/Brand'
 import Magnet from '@/components/reactbits/Magnet'
 import { useI18n, type DictKey } from '@/lib/i18n'
 import { usePublicData } from '@/data/store'
+import { primaryPhone, telHref } from '@/lib/contact'
 import { gsap } from '@/lib/smooth'
 
 const links: { to: string; key: DictKey }[] = [
@@ -102,7 +103,7 @@ export function Header() {
                 {lang === 'en' ? 'العربية' : 'English'}
               </button>
               <a
-                href={`tel:${settings.phone.replace(/\s/g, '')}`}
+                href={telHref(primaryPhone(settings))}
                 className={clsx(
                   'hidden h-11 w-11 items-center justify-center rounded-full transition-colors md:inline-flex',
                   overDark ? 'text-white hover:bg-white/10' : 'text-navy hover:bg-blue-20',
@@ -188,8 +189,8 @@ function MobileMenu({ open }: { open: boolean }) {
         <div className="mt-auto overflow-hidden">
           <div className="mm-item space-y-1 text-white/70">
             <p className="label">{t('nav.contact')}</p>
-            <a href={`tel:${settings.phone.replace(/\s/g, '')}`} className="block text-2xl font-semibold text-white" dir="ltr">
-              {settings.phone}
+            <a href={telHref(primaryPhone(settings))} className="block text-2xl font-semibold text-white" dir="ltr">
+              {primaryPhone(settings)}
             </a>
             <Link to="/dashboard" className="mt-5 inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-semibold text-white ring-1 ring-white/25">
               <LogIn size={16} strokeWidth={1.8} className="rtl:-scale-x-100" />
