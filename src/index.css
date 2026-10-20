@@ -1,0 +1,161 @@
+@import 'tailwindcss';
+@import 'lenis/dist/lenis.css';
+
+/* Brand tokens — Dr. Haitham AlHatiem Brand Identity Guidelines v1.0 */
+@theme {
+  --color-navy: #003478; /* Artery Navy — primary, 45% */
+  --color-navy-shadow: #00245a; /* hover, depth */
+  --color-mist: #f3f3f3; /* Clinical Mist — ground */
+  --color-vessel: #8dafbc; /* Vessel Blue — secondary (never text on light) */
+  --color-blush: #c9b3ac; /* Pulse Blush — accent, a whisper */
+  --color-ink: #0b1f3a; /* body text */
+  --color-deep: #4a6d7c; /* Deep Vessel — small labels */
+  --color-blue-40: #c9dae0; /* panels */
+  --color-blue-20: #e3ecef; /* tags, fills */
+
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: 'IBM Plex Sans Arabic', 'Manrope', sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
+
+  --animate-marquee: marquee var(--marquee-duration, 40s) linear infinite;
+  --animate-pulse-dot: pulse-dot 2.4s ease-out infinite;
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(-50% - var(--marquee-gap, 1.5rem) / 2)); }
+  }
+  @keyframes pulse-dot {
+    0% { box-shadow: 0 0 0 0 rgb(141 175 188 / 0.7); }
+    70% { box-shadow: 0 0 0 12px rgb(141 175 188 / 0); }
+    100% { box-shadow: 0 0 0 0 rgb(141 175 188 / 0); }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-mist text-ink font-sans;
+    font-feature-settings: 'ss01', 'cv11';
+  }
+  /* Arabic: ~110% size, 1.7–1.8 line height, never letter-spaced */
+  html[lang='ar'] body {
+    font-family: var(--font-arabic);
+    font-size: 110%;
+  }
+  html[lang='ar'] p {
+    line-height: 1.8;
+  }
+  html[lang='ar'] .tracking-label,
+  html[lang='ar'] [class*='tracking-'] {
+    letter-spacing: 0 !important;
+  }
+  ::selection {
+    background: var(--color-navy);
+    color: white;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-navy);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+  .on-navy :focus-visible {
+    outline-color: white;
+  }
+}
+
+@layer components {
+  .label {
+    @apply text-[11px] font-semibold uppercase text-deep;
+    letter-spacing: 0.24em;
+  }
+  .on-navy .label {
+    @apply text-vessel;
+  }
+  .display {
+    @apply font-bold text-navy;
+    letter-spacing: -0.03em;
+    line-height: 0.98;
+  }
+  .container-x {
+    @apply mx-auto w-full max-w-[1320px] px-5 sm:px-8 lg:px-12;
+  }
+  /* Pill buttons — fully rounded, min touch 44px */
+  .btn {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold transition-all duration-300 select-none;
+  }
+  .btn-primary {
+    @apply btn bg-navy text-white hover:bg-navy-shadow;
+    box-shadow: 0 10px 30px -12px rgb(0 52 120 / 0.55);
+  }
+  .btn-secondary {
+    @apply btn bg-vessel text-navy hover:bg-blue-40;
+  }
+  .btn-outline {
+    @apply btn border border-navy/80 text-navy hover:bg-navy hover:text-white;
+  }
+  .btn-ghost-light {
+    @apply btn border border-white/30 text-white hover:bg-white hover:text-navy;
+  }
+  .card {
+    @apply rounded-[28px] bg-white;
+  }
+  .field {
+    @apply w-full rounded-2xl border border-blue-40 bg-white px-4 py-3 text-sm text-ink outline-none transition placeholder:text-deep/60 focus:border-navy focus:ring-4 focus:ring-navy/10;
+  }
+  /* The fine rule — tapered, thick at centre, fading at both ends */
+  .fine-rule {
+    height: 3px;
+    background: radial-gradient(ellipse at center, currentColor 0%, currentColor 30%, transparent 72%);
+    clip-path: polygon(0 50%, 50% 0, 100% 50%, 50% 100%);
+  }
+  .pattern-wave-navy {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='48' viewBox='0 0 120 48'%3E%3Cpath d='M0 30h38c4 0 5-16 10-16s6 26 11 26 5-10 9-10h52' fill='none' stroke='%23ffffff' stroke-opacity='.07' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");
+  }
+  .pattern-wave-light {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='48' viewBox='0 0 120 48'%3E%3Cpath d='M0 30h38c4 0 5-16 10-16s6 26 11 26 5-10 9-10h52' fill='none' stroke='%238DAFBC' stroke-opacity='.35' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");
+  }
+  .pattern-tree-navy {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='96' viewBox='0 0 84 96'%3E%3Cpath d='M42 96V58M42 58C42 46 22 40 18 30M18 30C14 22 14 10 14 0M18 30C22 22 24 10 24 0M42 58C42 46 62 40 66 30M66 30C62 22 60 10 60 0M66 30C70 22 70 10 70 0' fill='none' stroke='%238DAFBC' stroke-opacity='.18' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");
+  }
+  .grain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.06;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .mask-fade-x {
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .thin-scroll::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .thin-scroll::-webkit-scrollbar-thumb {
+    background: var(--color-blue-40);
+    border-radius: 99px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
