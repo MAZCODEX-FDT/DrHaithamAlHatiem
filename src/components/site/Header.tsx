@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useLenis } from 'lenis/react'
 import { useGSAP } from '@gsap/react'
 import clsx from 'clsx'
-import { ArrowUpRight, Menu, Phone, X } from 'lucide-react'
+import { ArrowUpRight, LogIn, Menu, Phone, X } from 'lucide-react'
 import { Wordmark } from '@/components/brand/Brand'
 import Magnet from '@/components/reactbits/Magnet'
 import { useI18n, type DictKey } from '@/lib/i18n'
@@ -111,6 +111,17 @@ export function Header() {
               >
                 <Phone size={18} strokeWidth={1.8} />
               </a>
+              <Link
+                to="/dashboard"
+                className={clsx(
+                  'hidden h-11 items-center justify-center gap-2 rounded-full text-sm font-semibold transition-colors sm:inline-flex sm:w-11 lg:w-auto lg:px-4',
+                  overDark && !open ? 'text-white hover:bg-white/10' : 'text-navy hover:bg-blue-20',
+                )}
+                aria-label={t('footer.dashboard')}
+              >
+                <LogIn size={18} strokeWidth={1.8} className="rtl:-scale-x-100" />
+                <span className="hidden lg:inline">{t('nav.login')}</span>
+              </Link>
               {/* Magnet sets an inline display, so the breakpoint lives on this wrapper */}
               <div className="hidden sm:block">
                 <Magnet padding={40} magnetStrength={4}>
@@ -180,6 +191,10 @@ function MobileMenu({ open }: { open: boolean }) {
             <a href={`tel:${settings.phone.replace(/\s/g, '')}`} className="block text-2xl font-semibold text-white" dir="ltr">
               {settings.phone}
             </a>
+            <Link to="/dashboard" className="mt-5 inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-semibold text-white ring-1 ring-white/25">
+              <LogIn size={16} strokeWidth={1.8} className="rtl:-scale-x-100" />
+              {t('footer.dashboard')}
+            </Link>
           </div>
         </div>
       </div>

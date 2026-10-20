@@ -8,6 +8,7 @@ const dict = {
   'nav.guide': { en: 'Patient guide', ar: 'دليل المريض' },
   'nav.contact': { en: 'Contact', ar: 'تواصل' },
   'nav.book': { en: 'Book', ar: 'احجز' },
+  'nav.login': { en: 'Login', ar: 'دخول' },
   'nav.home': { en: 'Home', ar: 'الرئيسية' },
   'cta.book': { en: 'Book appointment', ar: 'احجز موعداً' },
   'cta.bookConsult': { en: 'Book a consultation', ar: 'احجز استشارة' },
