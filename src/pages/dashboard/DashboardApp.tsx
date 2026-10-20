@@ -126,10 +126,17 @@ function Login({ onLogin }: { onLogin: () => void }) {
           <h1 className="lg-in text-3xl font-bold tracking-tight text-navy">Sign in</h1>
           <p className="lg-in mt-2 text-sm text-deep">Clinic team access only.</p>
           <div className="mt-8 space-y-4">
-            <input className="lg-in field" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="username" />
-            <input className="lg-in field" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
+            {/* .field and .btn carry CSS transitions that freeze a GSAP fade part-way, so the fade runs on wrappers */}
+            <div className="lg-in">
+              <input className="field" type="email" placeholder="Email" aria-label="Email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="username" />
+            </div>
+            <div className="lg-in">
+              <input className="field" type="password" placeholder="Password" aria-label="Password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
+            </div>
             {err && <p className="text-sm text-rose-700">{err}</p>}
-            <button className="lg-in btn-primary w-full">Sign in</button>
+            <div className="lg-in">
+              <button className="btn-primary w-full">Sign in</button>
+            </div>
           </div>
           <p className="lg-in mt-6 rounded-2xl bg-blue-20 p-4 text-xs leading-relaxed text-navy">
             Demo access — password <b className="font-mono">{DEMO.password}</b>
