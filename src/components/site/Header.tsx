@@ -111,12 +111,15 @@ export function Header() {
               >
                 <Phone size={18} strokeWidth={1.8} />
               </a>
-              <Magnet padding={40} magnetStrength={4} wrapperClassName="hidden sm:block">
-                <Link to="/book" className={clsx(overDark ? 'btn bg-white text-navy hover:bg-mist' : 'btn-primary', 'h-12')}>
-                  {t('nav.book')}
-                  <ArrowUpRight size={16} className="rtl:-scale-x-100" />
-                </Link>
-              </Magnet>
+              {/* Magnet sets an inline display, so the breakpoint lives on this wrapper */}
+              <div className="hidden sm:block">
+                <Magnet padding={40} magnetStrength={4}>
+                  <Link to="/book" className={clsx(overDark ? 'btn bg-white text-navy hover:bg-mist' : 'btn-primary', 'h-12')}>
+                    {t('nav.book')}
+                    <ArrowUpRight size={16} className="rtl:-scale-x-100" />
+                  </Link>
+                </Magnet>
+              </div>
               <button
                 onClick={() => setOpen((o) => !o)}
                 className={clsx(

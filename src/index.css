@@ -69,6 +69,11 @@
   }
 }
 
+/* Pill buttons — fully rounded, min touch 44px. A utility so the variants below can @apply it */
+@utility btn {
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold transition-all duration-300 select-none disabled:pointer-events-none disabled:opacity-40 disabled:shadow-none;
+}
+
 @layer components {
   .label {
     @apply text-[11px] font-semibold uppercase text-deep;
@@ -84,10 +89,6 @@
   }
   .container-x {
     @apply mx-auto w-full max-w-[1320px] px-5 sm:px-8 lg:px-12;
-  }
-  /* Pill buttons — fully rounded, min touch 44px */
-  .btn {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold transition-all duration-300 select-none;
   }
   .btn-primary {
     @apply btn bg-navy text-white hover:bg-navy-shadow;

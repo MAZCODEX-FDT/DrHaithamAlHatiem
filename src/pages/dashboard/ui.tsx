@@ -128,11 +128,11 @@ export function BilingualField({ label, value, onChange, multiline, rows = 3 }: 
       <div className="grid gap-2 md:grid-cols-2">
         <div className="relative">
           <span className="absolute top-2.5 left-3 text-[10px] font-bold text-deep/60">EN</span>
-          <Comp className="field ps-10" rows={rows} value={value.en} onChange={(e) => onChange({ ...value, en: e.target.value })} />
+          <Comp className="field pl-10" rows={rows} value={value.en} onChange={(e) => onChange({ ...value, en: e.target.value })} />
         </div>
         <div className="relative">
           <span className="absolute top-2.5 right-3 text-[10px] font-bold text-deep/60">AR</span>
-          <Comp className="field pe-10" dir="rtl" style={{ fontFamily: 'var(--font-arabic)' }} rows={rows} value={value.ar} onChange={(e) => onChange({ ...value, ar: e.target.value })} />
+          <Comp className="field pr-10" dir="rtl" style={{ fontFamily: 'var(--font-arabic)' }} rows={rows} value={value.ar} onChange={(e) => onChange({ ...value, ar: e.target.value })} />
         </div>
       </div>
     </div>
