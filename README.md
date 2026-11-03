@@ -23,7 +23,7 @@ npm run lint     # oxlint
 | `/services`, `/services/:slug` | All services and one page per condition or procedure |
 | `/guide`, `/guide/:slug` | Patient guide (health tips) |
 | `/book` | Appointment request form |
-| `/contact` | Branches (address, phone numbers, Google Maps link), hours, question form |
+| `/contact` | The three clinics (address, days, start time, Google Maps link), weekly schedule, phone, WhatsApp, question form |
 
 The language switch flips the whole site to Arabic and RTL (IBM Plex Sans Arabic). English uses Manrope.
 
@@ -39,8 +39,9 @@ The dashboard manages website content only:
 - **Settings:**
   - doctor profile;
   - clinic WhatsApp (receives all bookings) and email;
-  - **branches**: any number, each with a name, an address, several phone numbers and a Google Maps link;
-  - hours, social links, announcement bar and homepage figures.
+  - clinic phone numbers;
+  - **clinics**: any number, each with a name, an address, its clinic days, a start time, a Google Maps link and optional numbers of its own;
+  - social links, announcement bar and homepage figures.
 
 There are no patient, appointment or treatment records.
 
@@ -49,7 +50,7 @@ There are no patient, appointment or treatment records.
 - **Website content is stored in the browser only** (`localStorage`, see `src/data/store.tsx`), so dashboard edits are visible only on the device that made them. To publish edits for every visitor, either put the content behind a small API (replace `load`/`save` in `useStore()`), or edit the defaults in `src/data/seed.ts` and redeploy.
 - **The dashboard login is a front-end demo gate** (`src/pages/dashboard/DashboardApp.tsx`, password `vascular2026`). It is not security: anyone reading the page source can find it. Production needs server-side authentication.
 - **Clinic photos are placeholders.** Replace `public/brand/consultation-room.jpg`, `waiting-area.jpg` and `credentials-wall.jpg` with real photos at the same names.
-- **Fill in real details** in `src/data/seed.ts` (or Dashboard → Settings): branches with addresses, phone numbers and Google Maps links, the clinic WhatsApp number, and social links. These are currently placeholders.
+- **Clinics:** New Giza (Sat/Mon/Wed from 4 PM), Arab Contractors Hospital (Sun/Tue from 2 PM) and Misr University Hospital – Souad Kafafi (Sat/Mon/Thu from 2 PM) are in `src/data/seed.ts`. Their map links are Google Maps searches; replace them with exact share links when available. Social links are still generic.
 
 ## Brand
 

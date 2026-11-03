@@ -61,14 +61,6 @@ export interface Faq {
 }
 
 export type DayKey = 'sat' | 'sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri'
-export interface Hours {
-  day: DayKey
-  open: string
-  close: string
-  closed: boolean
-  byAppointment?: boolean
-}
-
 export interface Stat {
   id: string
   value: number
@@ -76,11 +68,16 @@ export interface Stat {
   label: L
 }
 
-/** One clinic location: its own address, phone numbers and map link */
+/** One clinic location: where it is, which days the doctor is there and from what time */
 export interface Branch {
   id: string
   name: L
   address: L
+  /** days the doctor holds clinic here */
+  days: DayKey[]
+  /** start time, HH:mm */
+  from: string
+  /** numbers that belong to this location only (the clinic-wide numbers are Settings.phones) */
   phones: string[]
   /** Google Maps link for the location (a share link or any maps URL) */
   mapUrl: string
@@ -91,8 +88,9 @@ export interface Settings {
   /** Clinic WhatsApp, international format, digits only: receives every booking and message from the site */
   whatsapp: string
   email: string
+  /** clinic-wide numbers for calls and bookings */
+  phones: string[]
   branches: Branch[]
-  hours: Hours[]
   stats: Stat[]
   social: { instagram: string; facebook: string; google: string }
   announcement: L

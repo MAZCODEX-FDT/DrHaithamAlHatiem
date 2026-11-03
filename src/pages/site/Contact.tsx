@@ -1,12 +1,12 @@
 import { useState, type FormEvent } from 'react'
 import clsx from 'clsx'
-import { ArrowUpRight, Check, Mail, MapPin, Phone } from 'lucide-react'
+import { ArrowUpRight, CalendarDays, Check, Mail, MapPin, Phone } from 'lucide-react'
 import { PageHero, Reveal } from '@/components/site/ui'
 import { usePublicData } from '@/data/store'
-import { dayFromIndex, dayNames, formatTime, useI18n } from '@/lib/i18n'
+import { dayFromIndex, dayNames, useI18n } from '@/lib/i18n'
 import { FaqSection } from './home/Sections'
 import { BookingSection, WhatsAppIcon } from '@/components/site/BookingRequest'
-import { branchPhones, sendWhatsApp, telHref, waHref } from '@/lib/contact'
+import { WEEK, allPhones, branchDays, branchFrom, branchPhones, sendWhatsApp, telHref, waHref } from '@/lib/contact'
 
 export default function Contact() {
   const { t, tr, lang } = useI18n()
@@ -49,6 +49,12 @@ export default function Contact() {
                   </span>
                   <p className="label mt-8">{settings.branches.length > 1 ? tr(b.name) : t('contact.label')}</p>
                   <p className="mt-2 text-lg font-semibold text-navy">{tr(b.address)}</p>
+                  <p className="mt-3 flex w-fit items-start gap-2 rounded-2xl bg-blue-20 px-3 py-2 text-sm font-semibold text-navy">
+                    <CalendarDays size={15} strokeWidth={1.8} className="mt-0.5 shrink-0" />
+                    <span>
+                      {branchDays(b, lang)} · {t('contact.from')} <span className="whitespace-nowrap">{branchFrom(b, lang)}</span>
+                    </span>
+                  </p>
                   <div className="mt-5 space-y-2">
                     {branchPhones(b).map((ph) => (
                       <a key={ph} href={telHref(ph)} className="flex items-center gap-2 font-semibold text-navy hover:underline">
@@ -67,10 +73,11 @@ export default function Contact() {
               </Reveal>
             ))}
             {[
+              ...allPhones(settings).map((ph) => ({ Icon: Phone, label: t('cta.call'), value: ph, href: telHref(ph) })),
               { Icon: WhatsAppIcon, label: t('cta.whatsapp'), value: `+${settings.whatsapp}`, href: waHref(settings.whatsapp) },
               { Icon: Mail, label: 'Email', value: settings.email, href: `mailto:${settings.email}` },
-            ].map(({ Icon, label, value, href }, i) => (
-              <Reveal key={label} delay={0.1 + i * 0.06}>
+            ].map(({ Icon, label, value, href }, i, all) => (
+              <Reveal key={value} delay={0.1 + i * 0.06} className={all.length % 2 === 1 && i === all.length - 1 ? 'sm:col-span-2' : undefined}>
                 <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noreferrer" className="group card flex h-full flex-col p-7 transition hover:-translate-y-1">
                   <span className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-20 text-navy transition group-hover:bg-navy group-hover:text-white">
                     <Icon size={22} />
@@ -87,19 +94,30 @@ export default function Contact() {
           <div className="space-y-4 lg:col-span-5">
             <Reveal delay={0.1}>
               <div className="on-navy rounded-[28px] bg-navy p-8 text-white">
-                <p className="label">{t('contact.hours')}</p>
+                <p className="label">{t('contact.schedule')}</p>
                 <ul className="mt-6 divide-y divide-white/10">
-                  {settings.hours.map((h) => (
-                    <li key={h.day} className={clsx('flex items-center justify-between py-3 text-sm', h.day === todayKey && 'font-semibold')}>
-                      <span className="flex items-center gap-2">
-                        {h.day === todayKey && <span className="h-2 w-2 animate-pulse-dot rounded-full bg-vessel" />}
-                        {tr(dayNames[h.day])}
-                      </span>
-                      <span className={h.closed ? 'text-white/40' : 'text-white/80'} dir="ltr">
-                        {h.closed ? t('contact.closed') : h.byAppointment ? t('contact.byAppt') : `${formatTime(h.open, lang)} – ${formatTime(h.close, lang)}`}
-                      </span>
-                    </li>
-                  ))}
+                  {WEEK.map((day) => {
+                    const here = settings.branches.filter((b) => b.days.includes(day)).sort((a, b) => a.from.localeCompare(b.from))
+                    return (
+                      <li key={day} className={clsx('flex items-start justify-between gap-4 py-3 text-sm', day === todayKey && 'font-semibold')}>
+                        <span className="flex shrink-0 items-center gap-2">
+                          {day === todayKey && <span className="h-2 w-2 animate-pulse-dot rounded-full bg-vessel" />}
+                          {tr(dayNames[day])}
+                        </span>
+                        {here.length ? (
+                          <span className="space-y-1 text-end text-white/80">
+                            {here.map((b) => (
+                              <span key={b.id} className="block">
+                                {tr(b.name)} · <span dir="ltr">{branchFrom(b, lang)}</span>
+                              </span>
+                            ))}
+                          </span>
+                        ) : (
+                          <span className="text-white/40">{t('contact.closed')}</span>
+                        )}
+                      </li>
+                    )
+                  })}
                 </ul>
               </div>
             </Reveal>

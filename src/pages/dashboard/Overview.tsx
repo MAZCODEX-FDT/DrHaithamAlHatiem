@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
-import { ArrowUpRight, FileText, MapPin, MessageCircle, Phone, Star, Stethoscope } from 'lucide-react'
+import { ArrowUpRight, CalendarDays, FileText, MapPin, MessageCircle, Phone, Star, Stethoscope } from 'lucide-react'
 import { useStore } from '@/data/store'
+import { branchDays, branchFrom, clinicPhones } from '@/lib/contact'
 import { Kpi, PageHeader, Panel } from './ui'
 
 /** Summary of the website's content, and where bookings go */
@@ -43,7 +44,7 @@ export default function Overview() {
         </Panel>
 
         <Panel
-          title={`Branches · ${settings.branches.length}`}
+          title={`Clinics · ${settings.branches.length}`}
           className="xl:col-span-3"
           action={
             <Link to="/dashboard/settings" className="inline-flex items-center gap-1 text-xs font-semibold text-navy hover:underline">
@@ -55,13 +56,16 @@ export default function Overview() {
             {settings.branches.map((b) => (
               <li key={b.id} className="flex flex-wrap items-start gap-x-6 gap-y-2 py-4 first:pt-0 last:pb-0">
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-navy">{b.name.en || 'Unnamed branch'}</p>
+                  <p className="font-semibold text-navy">{b.name.en || 'Unnamed clinic'}</p>
+                  <p className="mt-1 flex items-center gap-1.5 text-sm font-medium text-navy">
+                    <CalendarDays size={14} /> {branchDays(b, 'en') || 'No days set'} · from {branchFrom(b, 'en')}
+                  </p>
                   <p className="mt-1 flex items-start gap-1.5 text-sm text-deep">
                     <MapPin size={14} className="mt-0.5 shrink-0" /> {b.address.en || '—'}
                   </p>
                 </div>
                 <div className="space-y-1 text-sm">
-                  {b.phones.filter(Boolean).map((ph) => (
+                  {(b.phones.filter(Boolean).length ? b.phones.filter(Boolean) : clinicPhones(settings)).map((ph) => (
                     <p key={ph} className="flex items-center gap-1.5 text-ink/80" dir="ltr">
                       <Phone size={13} /> {ph}
                     </p>

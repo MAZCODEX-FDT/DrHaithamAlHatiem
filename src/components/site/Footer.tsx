@@ -3,8 +3,8 @@ import type { SVGProps } from 'react'
 import { ArrowUpRight, MapPin, Phone } from 'lucide-react'
 import { PulseLine, Wordmark } from '@/components/brand/Brand'
 import { usePublicData } from '@/data/store'
-import { dayNames, formatTime, useI18n } from '@/lib/i18n'
-import { branchPhones, telHref } from '@/lib/contact'
+import { useI18n } from '@/lib/i18n'
+import { allPhones, branchDays, branchFrom, telHref } from '@/lib/contact'
 
 export function Footer() {
   const { t, tr, lang } = useI18n()
@@ -47,41 +47,40 @@ export function Footer() {
               ))}
             </ul>
           </div>
-          <div>
-            <p className="label mb-5">{t('contact.hours')}</p>
-            <ul className="space-y-2.5 text-sm text-white/80">
-              {settings.hours.map((h) => (
-                <li key={h.day} className="flex justify-between gap-3">
-                  <span>{tr(dayNames[h.day])}</span>
-                  <span className="text-white/60" dir="ltr">
-                    {h.closed ? t('contact.closed') : h.byAppointment ? t('contact.byAppt') : `${formatTime(h.open, lang)} – ${formatTime(h.close, lang)}`}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <p className="label mb-5">{t('nav.contact')}</p>
-            <ul className="space-y-6 text-sm text-white/80">
-              {settings.branches.map((b) => (
-                <li key={b.id} className="space-y-2">
-                  {settings.branches.length > 1 && <p className="font-semibold text-white">{tr(b.name)}</p>}
-                  <a href={b.mapUrl || undefined} target="_blank" rel="noreferrer" className="flex gap-3 hover:text-white">
-                    <MapPin size={18} strokeWidth={1.8} className="mt-0.5 shrink-0 text-vessel" />
-                    <span>{tr(b.address)}</span>
-                  </a>
-                  {branchPhones(b).map((ph) => (
-                    <a key={ph} href={telHref(ph)} className="flex gap-3 font-semibold text-white">
-                      <Phone size={18} strokeWidth={1.8} className="mt-0.5 shrink-0 text-vessel" />
-                      <span dir="ltr">{ph}</span>
+          <div className="sm:col-span-2 sm:grid sm:grid-cols-2 sm:gap-10">
+            <div>
+              <p className="label mb-5">{t('contact.clinics')}</p>
+              <ul className="space-y-5 text-sm text-white/80">
+                {settings.branches.map((b) => (
+                  <li key={b.id}>
+                    <p className="font-semibold text-white">{tr(b.name)}</p>
+                    <p className="mt-1 text-white/70">
+                      {branchDays(b, lang)} · <span dir="ltr">{branchFrom(b, lang)}</span>
+                    </p>
+                    <a href={b.mapUrl || undefined} target="_blank" rel="noreferrer" className="mt-1 flex gap-2 text-white/60 hover:text-white">
+                      <MapPin size={15} strokeWidth={1.8} className="mt-0.5 shrink-0 text-vessel" />
+                      <span>{tr(b.address)}</span>
                     </a>
-                  ))}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="mt-10 sm:mt-0">
+            <p className="label mb-5">{t('nav.contact')}</p>
+            <ul className="space-y-3 text-sm">
+              {allPhones(settings).map((ph) => (
+                <li key={ph}>
+                  <a href={telHref(ph)} className="flex gap-3 font-semibold text-white">
+                    <Phone size={18} strokeWidth={1.8} className="mt-0.5 shrink-0 text-vessel" />
+                    <span dir="ltr">{ph}</span>
+                  </a>
                 </li>
               ))}
             </ul>
             <Link to="/book" className="btn mt-7 bg-white text-navy hover:bg-mist">
               {t('cta.book')}
             </Link>
+            </div>
           </div>
         </div>
       </div>

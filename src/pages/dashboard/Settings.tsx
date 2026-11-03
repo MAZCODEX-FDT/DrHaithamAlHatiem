@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import clsx from 'clsx'
 import { Plus, RotateCcw, Trash2 } from 'lucide-react'
 import { uid, useStore } from '@/data/store'
-import type { Branch, Hours, Settings, Stat } from '@/data/types'
+import type { Branch, Settings, Stat } from '@/data/types'
 import { dayNames } from '@/lib/i18n'
+import { WEEK } from '@/lib/contact'
 import { BilingualField, Field, PageHeader, Panel, Toggle } from './ui'
 
 /**
@@ -26,7 +27,6 @@ export default function SettingsPage() {
 
   const set = <K extends keyof Settings>(k: K, v: Settings[K]) => setDraft((d) => ({ ...d, [k]: v }))
   const setDoctor = (k: keyof Settings['doctor'], v: Settings['doctor'][typeof k]) => setDraft((d) => ({ ...d, doctor: { ...d.doctor, [k]: v } }))
-  const setHours = (i: number, h: Partial<Hours>) => set('hours', draft.hours.map((x, j) => (j === i ? { ...x, ...h } : x)))
   const setStat = (i: number, s: Partial<Stat>) => set('stats', draft.stats.map((x, j) => (j === i ? { ...x, ...s } : x)))
   const setBranch = (i: number, b: Partial<Branch>) => set('branches', draft.branches.map((x, j) => (j === i ? { ...x, ...b } : x)))
 
@@ -40,7 +40,7 @@ export default function SettingsPage() {
     <>
       <PageHeader
         title="Settings"
-        sub="Clinic details, branches, hours and the content the website shows. Changes go live when you save."
+        sub="Clinic details, clinics and their days, and the content the website shows. Changes go live when you save."
         actions={
           <>
             {dirty && (
@@ -65,8 +65,9 @@ export default function SettingsPage() {
           </div>
         </Panel>
 
-        <Panel title="WhatsApp & email">
+        <Panel title="Phone, WhatsApp & email">
           <div className="space-y-4">
+            <PhoneList label="Clinic phone numbers" hint="Shown in the header, footer, Contact page and the floating Call button" phones={draft.phones} onChange={(v) => set('phones', v)} />
             <Field label="Clinic WhatsApp" hint="Every booking and message from the website is sent here. International format, digits only, e.g. 2010…">
               <input className="field" inputMode="numeric" value={draft.whatsapp} onChange={(e) => set('whatsapp', e.target.value.replace(/\D/g, ''))} />
             </Field>
@@ -86,30 +87,6 @@ export default function SettingsPage() {
           </div>
         </Panel>
 
-        <Panel title="Clinic hours">
-          <ul className="divide-y divide-navy/[0.06]">
-            {draft.hours.map((h, i) => (
-              <li key={h.day} className="flex flex-wrap items-center gap-3 py-3">
-                <span className="w-24 text-sm font-semibold text-navy">{dayNames[h.day].en}</span>
-                <Toggle checked={!h.closed} onChange={(v) => setHours(i, { closed: !v })} />
-                {h.closed ? (
-                  <span className="text-sm text-deep">Closed</span>
-                ) : (
-                  <>
-                    <input type="time" className="field w-auto py-2" value={h.open} onChange={(e) => setHours(i, { open: e.target.value })} aria-label={`${dayNames[h.day].en} opens`} />
-                    <span className="text-deep">–</span>
-                    <input type="time" className="field w-auto py-2" value={h.close} onChange={(e) => setHours(i, { close: e.target.value })} aria-label={`${dayNames[h.day].en} closes`} />
-                    <label className="ml-auto flex items-center gap-2 text-xs text-deep">
-                      <input type="checkbox" checked={!!h.byAppointment} onChange={(e) => setHours(i, { byAppointment: e.target.checked })} className="accent-navy" />
-                      By appointment
-                    </label>
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
-        </Panel>
-
         <Panel title="Announcement bar">
           <div className="space-y-4">
             <Toggle checked={draft.announcementOn} onChange={(v) => set('announcementOn', v)} label={draft.announcementOn ? 'Shown on the website' : 'Hidden'} />
@@ -120,49 +97,56 @@ export default function SettingsPage() {
         </Panel>
 
         <Panel
-          title="Branches"
+          title="Clinics"
           className="xl:col-span-2"
           action={
-            <button className="inline-flex h-9 items-center gap-1.5 rounded-full bg-blue-20 px-4 text-xs font-semibold text-navy hover:bg-blue-40" onClick={() => set('branches', [...draft.branches, { id: uid('br'), name: { en: '', ar: '' }, address: { en: '', ar: '' }, phones: [''], mapUrl: '' }])}>
-              <Plus size={14} /> Add branch
+            <button className="inline-flex h-9 items-center gap-1.5 rounded-full bg-blue-20 px-4 text-xs font-semibold text-navy hover:bg-blue-40" onClick={() => set('branches', [...draft.branches, { id: uid('br'), name: { en: '', ar: '' }, address: { en: '', ar: '' }, days: [], from: '16:00', phones: [], mapUrl: '' }])}>
+              <Plus size={14} /> Add clinic
             </button>
           }
         >
-          <p className="-mt-2 mb-5 text-xs text-deep">Each branch appears on the Contact page, in the footer and in the booking form. Patients pick their branch when they book.</p>
+          <p className="-mt-2 mb-5 text-xs text-deep">Each clinic appears on the Contact page with its days, in the footer and in the booking form. Patients choose the clinic when they book.</p>
           <div className="space-y-5">
             {draft.branches.map((b, i) => (
               <div key={b.id} className="space-y-4 rounded-2xl bg-mist p-5">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-bold text-navy">Branch {i + 1}</p>
+                  <p className="text-sm font-bold text-navy">Clinic {i + 1}</p>
                   {draft.branches.length > 1 && (
-                    <button onClick={() => confirm('Remove this branch?') && set('branches', draft.branches.filter((_, j) => j !== i))} className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-semibold text-rose-700 hover:bg-rose-50">
+                    <button onClick={() => confirm('Remove this clinic?') && set('branches', draft.branches.filter((_, j) => j !== i))} className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-semibold text-rose-700 hover:bg-rose-50">
                       <Trash2 size={14} /> Remove
                     </button>
                   )}
                 </div>
-                <BilingualField label="Branch name" value={b.name} onChange={(v) => setBranch(i, { name: v })} />
+                <BilingualField label="Clinic name" value={b.name} onChange={(v) => setBranch(i, { name: v })} />
                 <BilingualField label="Address" value={b.address} onChange={(v) => setBranch(i, { address: v })} />
+                <div className="grid gap-4 md:grid-cols-[1fr_auto]">
+                  <div>
+                    <span className="mb-1.5 block text-xs font-semibold tracking-wide text-deep uppercase">Clinic days</span>
+                    <div className="flex flex-wrap gap-2">
+                      {WEEK.map((d) => {
+                        const on = b.days.includes(d)
+                        return (
+                          <button
+                            key={d}
+                            type="button"
+                            aria-pressed={on}
+                            onClick={() => setBranch(i, { days: on ? b.days.filter((x) => x !== d) : [...b.days, d] })}
+                            className={clsx('h-10 rounded-full px-4 text-sm font-semibold transition-colors', on ? 'bg-navy text-white' : 'bg-white text-navy ring-1 ring-navy/10 hover:bg-blue-20')}
+                          >
+                            {dayNames[d].en}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                  <Field label="Starts at">
+                    <input type="time" className="field w-auto" value={b.from} onChange={(e) => setBranch(i, { from: e.target.value })} />
+                  </Field>
+                </div>
                 <Field label="Google Maps link" hint="In Google Maps: Share → Copy link, then paste it here">
                   <input className="field" type="url" dir="ltr" placeholder="https://maps.app.goo.gl/…" value={b.mapUrl} onChange={(e) => setBranch(i, { mapUrl: e.target.value })} />
                 </Field>
-                <div>
-                  <span className="mb-1.5 block text-xs font-semibold tracking-wide text-deep uppercase">Phone numbers</span>
-                  <div className="space-y-2">
-                    {b.phones.map((ph, k) => (
-                      <div key={k} className="flex gap-2">
-                        <input className="field" dir="ltr" inputMode="tel" placeholder="010 0000 0000" value={ph} aria-label={`Branch ${i + 1} phone ${k + 1}`} onChange={(e) => setBranch(i, { phones: b.phones.map((x, m) => (m === k ? e.target.value : x)) })} />
-                        {b.phones.length > 1 && (
-                          <button onClick={() => setBranch(i, { phones: b.phones.filter((_, m) => m !== k) })} className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-rose-700 hover:bg-rose-50" aria-label="Remove number">
-                            <Trash2 size={15} />
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  <button onClick={() => setBranch(i, { phones: [...b.phones, ''] })} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-semibold text-navy hover:bg-blue-20">
-                    <Plus size={14} /> Add number
-                  </button>
-                </div>
+                <PhoneList label="This clinic's own numbers (optional)" hint="Only if this location has a number of its own; otherwise patients see the clinic phone numbers" phones={b.phones} onChange={(v) => setBranch(i, { phones: v })} optional />
               </div>
             ))}
           </div>
@@ -213,5 +197,30 @@ export default function SettingsPage() {
         </Panel>
       </div>
     </>
+  )
+}
+
+/** Editable list of phone numbers; optional lists may be empty */
+function PhoneList({ label, hint, phones, onChange, optional }: { label: string; hint?: string; phones: string[]; onChange: (v: string[]) => void; optional?: boolean }) {
+  return (
+    <div>
+      <span className="mb-1.5 block text-xs font-semibold tracking-wide text-deep uppercase">{label}</span>
+      <div className="space-y-2">
+        {phones.map((ph, k) => (
+          <div key={k} className="flex gap-2">
+            <input className="field" dir="ltr" inputMode="tel" placeholder="010 0000 0000" value={ph} aria-label={`${label} ${k + 1}`} onChange={(e) => onChange(phones.map((x, m) => (m === k ? e.target.value : x)))} />
+            {(optional || phones.length > 1) && (
+              <button onClick={() => onChange(phones.filter((_, m) => m !== k))} className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-rose-700 hover:bg-rose-50" aria-label="Remove number">
+                <Trash2 size={15} />
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+      <button onClick={() => onChange([...phones, ''])} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-semibold text-navy hover:bg-blue-20">
+        <Plus size={14} /> Add number
+      </button>
+      {hint && <span className="mt-1 block text-xs text-deep/80">{hint}</span>}
+    </div>
   )
 }

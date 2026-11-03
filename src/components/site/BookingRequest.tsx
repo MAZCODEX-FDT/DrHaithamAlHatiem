@@ -2,13 +2,13 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useGSAP } from '@gsap/react'
 import clsx from 'clsx'
-import { CalendarCheck, Check, MapPin, Phone, X } from 'lucide-react'
+import { CalendarCheck, CalendarDays, Check, MapPin, Phone, X } from 'lucide-react'
 import { FineRule } from '@/components/brand/Brand'
 import { Reveal } from '@/components/site/ui'
 import { usePublicData } from '@/data/store'
 import { iso } from '@/data/seed'
-import { branchPhones, primaryPhone, sendWhatsApp, telHref, waHref } from '@/lib/contact'
-import { formatDate, formatTime, useI18n } from '@/lib/i18n'
+import { allPhones, branchDays, branchFrom, branchPhones, clinicPhones, primaryPhone, sendWhatsApp, telHref, waHref } from '@/lib/contact'
+import { dayFromIndex, formatDate, formatTime, useI18n } from '@/lib/i18n'
 import { gsap } from '@/lib/smooth'
 
 /**
@@ -29,7 +29,10 @@ export function BookingRequestForm({ serviceId: preset, compact, onDone }: { ser
   }, [preset])
 
   const set = (k: keyof typeof form) => (e: { target: { value: string } }) => setForm({ ...form, [k]: e.target.value })
-  const valid = form.name.trim().length > 2 && form.phone.replace(/\D/g, '').length >= 8 && !!form.serviceId && (branches.length < 2 || !!form.branchId)
+  const chosen = branches.find((b) => b.id === form.branchId)
+  // a preferred day must be one of the chosen clinic's days
+  const wrongDay = !!chosen && !!form.date && !chosen.days.includes(dayFromIndex[new Date(form.date + 'T00:00:00').getDay()])
+  const valid = form.name.trim().length > 2 && form.phone.replace(/\D/g, '').length >= 8 && !!form.serviceId && (branches.length < 2 || !!form.branchId) && !wrongDay
 
   function submit(e: FormEvent) {
     e.preventDefault()
@@ -100,10 +103,20 @@ export function BookingRequestForm({ serviceId: preset, compact, onDone }: { ser
             </option>
             {branches.map((b) => (
               <option key={b.id} value={b.id}>
-                {tr(b.name)}
+                {tr(b.name)} — {branchDays(b, lang)} · {branchFrom(b, lang)}
               </option>
             ))}
           </select>
+          {chosen && (
+            <span className="mt-2 flex items-start gap-2 text-sm text-deep">
+              <CalendarDays size={16} strokeWidth={1.8} className="mt-0.5 shrink-0 text-navy" />
+              <span>
+                {t('req.clinicDays')} <b className="font-semibold text-navy">{branchDays(chosen, lang)}</b> · {t('contact.from')} <b className="font-semibold text-navy" dir="ltr">{branchFrom(chosen, lang)}</b>
+                <br />
+                <span className="text-xs">{tr(chosen.address)}</span>
+              </span>
+            </span>
+          )}
         </label>
       )}
       <label className={wide}>
@@ -121,7 +134,12 @@ export function BookingRequestForm({ serviceId: preset, compact, onDone }: { ser
       </label>
       <label>
         <span className={label}>{t('req.date')}</span>
-        <input className="field" type="date" min={today} value={form.date} onChange={set('date')} />
+        <input className={clsx('field', wrongDay && 'border-rose-400')} type="date" min={today} value={form.date} onChange={set('date')} aria-invalid={wrongDay} />
+        {wrongDay && (
+          <span role="alert" className="mt-1.5 block text-xs font-medium text-rose-700">
+            {t('req.wrongDay')}
+          </span>
+        )}
       </label>
       <label>
         <span className={label}>{t('req.time')}</span>
@@ -190,8 +208,12 @@ export function FloatingContact({ ready }: { ready: boolean }) {
   const openers = useRef<Record<string, HTMLButtonElement | null>>({})
   // the booking page already is the form
   const onBookPage = pathname.endsWith('/book')
-  const phones = settings.branches.flatMap(branchPhones)
-  const withPhones = settings.branches.filter((b) => branchPhones(b).length)
+  const phones = allPhones(settings)
+  // the clinic-wide numbers, then any clinic that has its own
+  const groups = [
+    { id: 'clinic', name: null as string | null, numbers: clinicPhones(settings) },
+    ...settings.branches.map((b) => ({ id: b.id, name: tr(b.name), numbers: branchPhones(b) })),
+  ].filter((g) => g.numbers.length)
 
   useEffect(() => setOpen(null), [pathname])
 
@@ -287,15 +309,15 @@ export function FloatingContact({ ready }: { ready: boolean }) {
               <BookingRequestForm compact onDone={() => setOpen(null)} />
             ) : (
               <ul className="space-y-4">
-                {withPhones.map((b) => (
-                  <li key={b.id}>
-                    {withPhones.length > 1 && (
+                {groups.map((g) => (
+                  <li key={g.id}>
+                    {g.name && groups.length > 1 && (
                       <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-navy">
-                        <MapPin size={14} /> {tr(b.name)}
+                        <MapPin size={14} /> {g.name}
                       </p>
                     )}
                     <div className="space-y-2">
-                      {branchPhones(b).map((ph) => (
+                      {g.numbers.map((ph) => (
                         <a key={ph} href={telHref(ph)} className="flex h-12 items-center gap-3 rounded-2xl bg-mist px-4 font-semibold text-navy hover:bg-blue-20">
                           <Phone size={16} strokeWidth={1.8} /> <span dir="ltr">{ph}</span>
                         </a>
