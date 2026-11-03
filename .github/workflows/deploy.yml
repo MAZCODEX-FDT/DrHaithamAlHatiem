@@ -17,7 +17,8 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Playwright (used to pre-render the pages) supports Ubuntu 24.04; ubuntu-latest has moved past it
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,12 +26,19 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Site address
+        # canonical URLs, hreflang, sitemap and structured data all use the public address
+        run: |
+          echo "BASE_PATH=/${{ github.event.repository.name }}/" >> "$GITHUB_ENV"
+          echo "SITE_URL=https://$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]').github.io/${{ github.event.repository.name }}" >> "$GITHUB_ENV"
       - run: npm run build
         env:
-          BASE_PATH: /${{ github.event.repository.name }}/
-      # GitHub Pages has no SPA fallback: serving index.html as the 404 page lets
-      # deep links such as /about or /dashboard load the app, which then routes.
-      - run: cp dist/index.html dist/404.html
+          VITE_SITE_URL: ${{ env.SITE_URL }}
+      # Every public page, in English and Arabic, is rendered to static HTML for search engines and
+      # AI crawlers, plus sitemap.xml, robots.txt and llms.txt. 404.html stays the bare app shell, so
+      # other paths (e.g. /dashboard) still load the app, which then routes.
+      - run: npx playwright install --with-deps chromium
+      - run: npm run prerender
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

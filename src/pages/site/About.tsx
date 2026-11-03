@@ -7,6 +7,9 @@ import { useI18n } from '@/lib/i18n'
 import { Clinic, CtaBand, Journey, Values } from './home/Sections'
 import { withBase } from '@/lib/base'
 
+import { Seo } from '@/components/seo/Seo'
+import { breadcrumbs, doctorPerson } from '@/lib/schema'
+
 export default function About() {
   const { t, tr, lang } = useI18n()
   const { settings } = usePublicData()
@@ -18,6 +21,7 @@ export default function About() {
   ]
   return (
     <>
+      <Seo title={t('seo.about.title')} description={t('seo.about.desc')} path="/about" jsonLd={[{ '@type': 'ProfilePage', mainEntity: doctorPerson(settings, lang) }, breadcrumbs([{ name: t('nav.home'), path: '/' }, { name: t('nav.about'), path: '/about' }], lang)]} />
       <section className="relative overflow-hidden pt-32 pb-20 sm:pt-40">
         <div className="container-x grid items-end gap-12 lg:grid-cols-12">
           <div className="lg:col-span-7">

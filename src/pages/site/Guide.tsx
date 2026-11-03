@@ -8,6 +8,9 @@ import { usePublicData } from '@/data/store'
 import { formatDate, useI18n } from '@/lib/i18n'
 import { CtaBand } from './home/Sections'
 import NotFound from './NotFound'
+import { Seo } from '@/components/seo/Seo'
+import { articlePage, breadcrumbs } from '@/lib/schema'
+import { absUrl } from '@/lib/site'
 
 export function GuidePage() {
   const { t, tr, lang } = useI18n()
@@ -21,6 +24,15 @@ export function GuidePage() {
   const rest = topic ? shown : shown.slice(1)
   return (
     <>
+      <Seo
+        title={t('seo.guide.title')}
+        description={t('seo.guide.desc')}
+        path="/guide"
+        jsonLd={[
+          { '@type': 'CollectionPage', name: t('seo.guide.title'), mainEntity: { '@type': 'ItemList', itemListElement: tips.map((tip, i) => ({ '@type': 'ListItem', position: i + 1, url: absUrl(`/guide/${tip.slug}`, lang), name: tr(tip.title) })) } },
+          breadcrumbs([{ name: t('nav.home'), path: '/' }, { name: t('nav.guide'), path: '/guide' }], lang),
+        ]}
+      />
       <PageHero label={t('tips.label')} title={t('tips.title')} />
       <section className="pb-24">
         <div className="container-x space-y-4">
@@ -89,6 +101,13 @@ export function TipDetail() {
   if (!tip) return <NotFound />
   return (
     <>
+      <Seo
+        title={tr(tip.title)}
+        description={tr(tip.excerpt)}
+        path={`/guide/${tip.slug}`}
+        type="article"
+        jsonLd={[articlePage(tip, lang), breadcrumbs([{ name: t('nav.home'), path: '/' }, { name: t('nav.guide'), path: '/guide' }, { name: tr(tip.title), path: `/guide/${tip.slug}` }], lang)]}
+      />
       <article className="pt-36 pb-24 sm:pt-44">
         <div className="container-x max-w-3xl">
           <Link to="/guide" className="inline-flex items-center gap-2 text-sm text-deep transition hover:text-navy">

@@ -1,12 +1,12 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useGSAP } from '@gsap/react'
 import clsx from 'clsx'
-import { CalendarCheck, CalendarDays, Check, MapPin, Phone, X } from 'lucide-react'
+import { CalendarCheck, CalendarDays, Check, MapPin, Phone, Stethoscope, X } from 'lucide-react'
 import { FineRule } from '@/components/brand/Brand'
+import { DatePicker, Select, TimePicker, timeOptions } from '@/components/site/Pickers'
 import { Reveal } from '@/components/site/ui'
 import { usePublicData } from '@/data/store'
-import { iso } from '@/data/seed'
 import { allPhones, branchDays, branchFrom, branchPhones, clinicPhones, primaryPhone, sendWhatsApp, telHref, waHref } from '@/lib/contact'
 import { dayFromIndex, formatDate, formatTime, useI18n } from '@/lib/i18n'
 import { gsap } from '@/lib/smooth'
@@ -22,7 +22,6 @@ export function BookingRequestForm({ serviceId: preset, compact, onDone }: { ser
   const empty = { name: '', phone: '', branchId: branches.length === 1 ? branches[0].id : '', serviceId: preset ?? '', date: '', time: '', notes: '' }
   const [form, setForm] = useState(empty)
   const [sent, setSent] = useState<string | null>(null)
-  const today = useMemo(() => iso(new Date()), [])
 
   useEffect(() => {
     if (preset) setForm((f) => ({ ...f, serviceId: preset }))
@@ -95,18 +94,16 @@ export function BookingRequestForm({ serviceId: preset, compact, onDone }: { ser
         <input className="field" dir="ltr" inputMode="tel" value={form.phone} onChange={set('phone')} autoComplete="tel" required />
       </label>
       {branches.length > 1 && (
-        <label className={wide}>
+        <div className={wide}>
           <span className={label}>{t('req.branch')}</span>
-          <select className="field" value={form.branchId} onChange={set('branchId')} required>
-            <option value="" disabled>
-              {t('req.chooseBranch')}
-            </option>
-            {branches.map((b) => (
-              <option key={b.id} value={b.id}>
-                {tr(b.name)} — {branchDays(b, lang)} · {branchFrom(b, lang)}
-              </option>
-            ))}
-          </select>
+          <Select
+            label={t('req.branch')}
+            placeholder={t('req.chooseBranch')}
+            icon={<MapPin size={18} strokeWidth={1.8} />}
+            value={form.branchId}
+            onChange={(v) => setForm((f) => ({ ...f, branchId: v }))}
+            options={branches.map((b) => ({ value: b.id, label: tr(b.name), hint: `${branchDays(b, lang)} · ${branchFrom(b, lang)}` }))}
+          />
           {chosen && (
             <span className="mt-2 flex items-start gap-2 text-sm text-deep">
               <CalendarDays size={16} strokeWidth={1.8} className="mt-0.5 shrink-0 text-navy" />
@@ -117,34 +114,48 @@ export function BookingRequestForm({ serviceId: preset, compact, onDone }: { ser
               </span>
             </span>
           )}
-        </label>
+        </div>
       )}
-      <label className={wide}>
+      <div className={wide}>
         <span className={label}>{t('req.service')}</span>
-        <select className="field" value={form.serviceId} onChange={set('serviceId')} required>
-          <option value="" disabled>
-            {t('req.chooseService')}
-          </option>
-          {services.map((s) => (
-            <option key={s.id} value={s.id}>
-              {tr(s.title)}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
+        <Select
+          label={t('req.service')}
+          placeholder={t('req.chooseService')}
+          icon={<Stethoscope size={18} strokeWidth={1.8} />}
+          value={form.serviceId}
+          onChange={(v) => setForm((f) => ({ ...f, serviceId: v }))}
+          options={services.map((sv) => ({ value: sv.id, label: tr(sv.title) }))}
+        />
+      </div>
+      <div>
         <span className={label}>{t('req.date')}</span>
-        <input className={clsx('field', wrongDay && 'border-rose-400')} type="date" min={today} value={form.date} onChange={set('date')} aria-invalid={wrongDay} />
+        <DatePicker
+          label={t('req.date')}
+          placeholder={t('req.anyDay')}
+          lang={lang}
+          value={form.date}
+          onChange={(v) => setForm((f) => ({ ...f, date: v }))}
+          allowedDays={chosen?.days}
+          invalid={wrongDay}
+        />
         {wrongDay && (
           <span role="alert" className="mt-1.5 block text-xs font-medium text-rose-700">
             {t('req.wrongDay')}
           </span>
         )}
-      </label>
-      <label>
+      </div>
+      <div>
         <span className={label}>{t('req.time')}</span>
-        <input className="field" type="time" value={form.time} onChange={set('time')} />
-      </label>
+        <TimePicker
+          label={t('req.time')}
+          placeholder={t('req.anyTime')}
+          lang={lang}
+          value={form.time}
+          onChange={(v) => setForm((f) => ({ ...f, time: v }))}
+          options={timeOptions(chosen?.from ?? '14:00', chosen ? 4 : 6)}
+          caption={chosen ? `${t('contact.from')} ${branchFrom(chosen, lang)} · ${tr(chosen.name)}` : undefined}
+        />
+      </div>
       <label className={wide}>
         <span className={label}>{t('form.notes')}</span>
         <textarea className="field min-h-20" rows={compact ? 2 : 3} value={form.notes} onChange={set('notes')} />
