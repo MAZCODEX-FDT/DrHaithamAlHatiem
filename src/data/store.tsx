@@ -9,14 +9,21 @@ import type { CollectionKey, DB, Settings } from './types'
  * public site immediately (and across tabs). Swap `load`/`save` for API calls
  * to move this onto a real backend — every consumer goes through this hook.
  */
-const KEY = 'dha:db:v1'
+const KEY = 'dha:db:v2'
+/** Data saved before the real clinics existed (one placeholder branch, shared opening hours) */
+const KEY_V1 = 'dha:db:v1'
 /** Ids of seed articles this browser has already been given — see addNewSeedTips */
 const SEEN_TIPS_KEY = 'dha:seen-tips'
 
 function load(): DB {
   try {
     const raw = localStorage.getItem(KEY)
-    if (raw) return addNewSeedTips(migrate(JSON.parse(raw)))
+    if (raw) return addNewSeedTips(JSON.parse(raw) as DB)
+    const v1 = localStorage.getItem(KEY_V1)
+    if (v1) {
+      localStorage.removeItem(KEY_V1)
+      return addNewSeedTips(fromV1(JSON.parse(v1)))
+    }
   } catch {
     /* storage unavailable or corrupt — fall back to seed */
   }
@@ -25,26 +32,16 @@ function load(): DB {
   return db
 }
 
-/** Saved data from before branches: the clinic records are dropped and the single phone/address becomes the first branch */
-function migrate(saved: DB & Record<string, unknown>): DB {
-  const { appointments: _a, patients: _p, inquiries: _i, ...db } = saved
-  const old = db.settings as DB['settings'] & { phone?: string; address?: DB['settings']['branches'][number]['address']; mapQuery?: string; slotMinutes?: number; bookingOpen?: boolean }
-  if (!Array.isArray(old.branches)) {
-    const { phone, address, mapQuery, slotMinutes: _s, bookingOpen: _b, ...rest } = old
-    const seed = createSeed().settings.branches[0]
-    db.settings = {
-      ...rest,
-      branches: [
-        {
-          ...seed,
-          address: address ?? seed.address,
-          phones: phone ? [phone] : seed.phones,
-          mapUrl: mapQuery ? `https://maps.google.com/?q=${encodeURIComponent(mapQuery)}` : seed.mapUrl,
-        },
-      ],
-    }
-  }
-  return db
+/**
+ * v1 → v2: keep the content the clinic edited (services, articles, reviews, FAQs,
+ * profile, figures…), drop the old clinical records, and take the real clinics,
+ * their days and the clinic numbers from the seed in place of the placeholder.
+ */
+function fromV1(saved: Record<string, unknown>): DB {
+  const { appointments: _a, patients: _p, inquiries: _i, settings, ...content } = saved
+  const { phone: _ph, address: _ad, mapQuery: _mq, slotMinutes: _s, bookingOpen: _b, hours: _h, branches: _br, ...kept } = settings as Record<string, unknown>
+  const seed = createSeed().settings
+  return { ...(content as Omit<DB, 'settings'>), settings: { ...seed, ...(kept as Partial<Settings>), phones: seed.phones, branches: seed.branches } }
 }
 
 /**
