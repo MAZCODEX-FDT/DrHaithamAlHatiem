@@ -94,6 +94,8 @@ const dict = {
   'req.chooseBranch': { en: 'Choose a clinic', ar: 'اختر العيادة' },
   'req.date': { en: 'Preferred day (optional)', ar: 'اليوم المفضل (اختياري)' },
   'req.time': { en: 'Preferred time (optional)', ar: 'الوقت المفضل (اختياري)' },
+  'req.anyDay': { en: 'Any day — pick a date', ar: 'أي يوم — اختر تاريخاً' },
+  'req.anyTime': { en: 'Any time', ar: 'أي وقت' },
   'req.send': { en: 'Send on WhatsApp', ar: 'إرسال عبر واتساب' },
   'req.another': { en: 'New request', ar: 'طلب جديد' },
   'req.doneTitle': { en: 'WhatsApp is open', ar: 'تم فتح واتساب' },
