@@ -1,7 +1,23 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, type ReactNode } from 'react'
+import { otherLangHref } from './site'
 import type { DayKey, L, Lang } from '@/data/types'
 
 const dict = {
+  'seo.home.title': { en: 'Vascular & Endovascular Surgeon in Giza and Cairo', ar: 'استشاري جراحة الأوعية الدموية والقسطرة في الجيزة والقاهرة' },
+  'seo.home.desc': { en: 'Dr. Haitham AlHatiem, consultant vascular & endovascular surgeon (FRCS, UK). Varicose veins, blocked arteries, diabetic foot, DVT and Doppler scans at New Giza, Arab Contractors and Misr University hospitals.', ar: 'د. هيثم الحطيم، استشاري جراحة الأوعية الدموية والقسطرة وزميل كلية الجراحين الملكية البريطانية. علاج الدوالي وانسداد الشرايين والقدم السكري وجلطات الأوردة وفحص الدوبلر في نيو جيزة ومستشفى المقاولون العرب ومستشفى جامعة مصر.' },
+  'seo.about.title': { en: 'About Dr. Haitham AlHatiem, FRCS (UK)', ar: 'عن د. هيثم الحطيم — زميل كلية الجراحين الملكية' },
+  'seo.about.desc': { en: 'Consultant vascular and endovascular surgeon and Fellow of the Royal College of Surgeons (UK), treating venous and arterial disease with minimally invasive techniques.', ar: 'استشاري جراحة الأوعية الدموية والقسطرة وزميل كلية الجراحين الملكية البريطانية، يعالج أمراض الأوردة والشرايين بأقل تدخل جراحي.' },
+  'seo.services.title': { en: 'Vascular Services: Veins, Arteries, Diabetic Foot', ar: 'خدمات جراحة الأوعية: الأوردة والشرايين والقدم السكري' },
+  'seo.services.desc': { en: 'Diagnosis and treatment of varicose veins, peripheral arterial disease, diabetic foot, DVT, aortic aneurysm and dialysis access, with same-visit Doppler scans.', ar: 'تشخيص وعلاج الدوالي ومرض الشرايين الطرفية والقدم السكري وجلطات الأوردة العميقة وتمدد الأورطي ووصلات الغسيل الكلوي، مع فحص الدوبلر في نفس الزيارة.' },
+  'seo.guide.title': { en: 'Patient Guide: Vein and Artery Health Tips', ar: 'دليل المريض: نصائح لصحة الأوردة والشرايين' },
+  'seo.guide.desc': { en: 'Plain-language articles on varicose veins, leg clots, diabetic foot care, arterial disease and preparing for your visit, reviewed by a vascular surgeon.', ar: 'مقالات بلغة بسيطة عن الدوالي وجلطات الساق والعناية بالقدم السكري وأمراض الشرايين والاستعداد لزيارتك، يراجعها استشاري جراحة أوعية.' },
+  'seo.contact.title': { en: 'Clinics, Days and Directions', ar: 'العيادات والمواعيد والعناوين' },
+  'seo.contact.desc': { en: 'Clinic days, start times and directions: New Giza Medical City (Sat, Mon, Wed), Arab Contractors Hospital (Sun, Tue) and Misr University Hospital (Sat, Mon, Thu).', ar: 'أيام ومواعيد العيادات والعناوين: المدينة الطبية نيو جيزة (السبت والاثنين والأربعاء)، مستشفى المقاولون العرب (الأحد والثلاثاء)، مستشفى جامعة مصر (السبت والاثنين والخميس).' },
+  'seo.book.title': { en: 'Request an Appointment', ar: 'اطلب موعداً' },
+  'seo.book.desc': { en: 'Choose a clinic, service and preferred day; your request opens in WhatsApp, ready to send to the clinic, which replies to confirm.', ar: 'اختر العيادة والخدمة واليوم المناسب، ويُفتح طلبك في واتساب جاهزاً للإرسال إلى العيادة التي ترد لتأكيد الموعد.' },
+  'services.guide': { en: 'On this page', ar: 'في هذه الصفحة' },
+  'services.faqTitle': { en: 'your questions', ar: 'أسئلتكم' },
+  'seo.reviewed': { en: 'Medically reviewed by', ar: 'مراجعة طبية:' },
   'nav.about': { en: 'About', ar: 'عن الطبيب' },
   'nav.services': { en: 'Services', ar: 'الخدمات' },
   'nav.journey': { en: 'Your visit', ar: 'زيارتك' },
@@ -156,15 +172,8 @@ interface I18n {
 
 const Ctx = createContext<I18n | null>(null)
 
-export function LangProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(() => {
-    try {
-      return (localStorage.getItem('dha:lang') as Lang) || 'en'
-    } catch {
-      return 'en'
-    }
-  })
-
+export function LangProvider({ lang, children }: { lang: Lang; children: ReactNode }) {
+  // the address decides the language (/ar/… is Arabic); switching loads the same page at the other address
   useEffect(() => {
     document.documentElement.lang = lang
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
@@ -175,8 +184,19 @@ export function LangProvider({ children }: { children: ReactNode }) {
     }
   }, [lang])
 
-  const setLang = useCallback((l: Lang) => setLangState(l), [])
-  const toggle = useCallback(() => setLangState((l) => (l === 'en' ? 'ar' : 'en')), [])
+  const setLang = useCallback(
+    (l: Lang) => {
+      if (l === lang) return
+      try {
+        localStorage.setItem('dha:lang', l)
+      } catch {
+        /* ignore */
+      }
+      window.location.assign(otherLangHref(l))
+    },
+    [lang],
+  )
+  const toggle = useCallback(() => setLang(lang === 'en' ? 'ar' : 'en'), [lang, setLang])
   const t = useCallback((k: DictKey) => dict[k][lang], [lang])
   const tr = useCallback((v: L) => v[lang] || v.en, [lang])
 

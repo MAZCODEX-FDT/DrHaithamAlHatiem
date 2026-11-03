@@ -45,6 +45,18 @@ The dashboard manages website content only:
 
 There are no patient, appointment or treatment records.
 
+### SEO and GEO (search engines and AI assistants)
+- **Two languages, two sets of addresses:** English at `/…`, Arabic at `/ar/…`. The language switch moves to the same page in the other language, and a visitor's choice is remembered.
+- **Pre-rendered HTML:** `npm run prerender` (run by the deploy workflow after `vite build`) opens every public page in both languages in a headless browser and saves the finished HTML. Crawlers that don't run JavaScript still read the full text.
+- **Every page has:**
+  - its own title, description and canonical address;
+  - `hreflang` links between English and Arabic;
+  - Open Graph tags;
+  - schema.org data (`src/lib/schema.ts`): Physician, Person, MedicalClinic per clinic with its days, MedicalWebPage, MedicalCondition, FAQPage, Article and BreadcrumbList.
+- **Generated at build:** `sitemap.xml` (with language alternates), `robots.txt` (AI crawlers welcome; the dashboard excluded), `llms.txt` and `llms-full.txt` (plain summaries for AI assistants).
+- **Service pages** carry long-form content and FAQs from `src/data/serviceContent.ts`: what it is, causes, diagnosis, treatment, recovery, when to see a surgeon. It is static content, edited in code rather than in the dashboard. Update `REVIEWED` in `src/lib/schema.ts` when the doctor re-reviews it.
+- **`robots.txt` only takes effect at a domain root.** Move the site to its own domain (and set `SITE_URL`), then submit `sitemap.xml` in Google Search Console and Bing Webmaster Tools.
+
 ## Before going live
 
 - **Website content is stored in the browser only** (`localStorage`, see `src/data/store.tsx`), so dashboard edits are visible only on the device that made them. To publish edits for every visitor, either put the content behind a small API (replace `load`/`save` in `useStore()`), or edit the defaults in `src/data/seed.ts` and redeploy.

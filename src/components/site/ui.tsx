@@ -51,7 +51,7 @@ export function MaskHeading({ lines, className, as: Tag = 'h2' }: { lines: strin
   )
 }
 
-export function SectionHeading({ label, title, sub, align = 'start', tone = 'light', className }: { label: string; title: string; sub?: string; align?: 'start' | 'center'; tone?: 'light' | 'dark'; className?: string }) {
+export function SectionHeading({ label, title, sub, align = 'start', tone = 'light', className, as }: { label: string; title: string; sub?: string; align?: 'start' | 'center'; tone?: 'light' | 'dark'; className?: string; as?: 'h1' | 'h2' }) {
   const lines = title.split('\n')
   return (
     <div className={clsx(align === 'center' && 'mx-auto text-center', 'max-w-3xl', className)}>
@@ -61,7 +61,7 @@ export function SectionHeading({ label, title, sub, align = 'start', tone = 'lig
           {label}
         </p>
       </Reveal>
-      <MaskHeading lines={lines} className={clsx('display mt-5 text-[clamp(2.2rem,5vw,4.2rem)]', tone === 'dark' && 'text-white')} />
+      <MaskHeading as={as} lines={lines} className={clsx('display mt-5 text-[clamp(2.2rem,5vw,4.2rem)]', tone === 'dark' && 'text-white')} />
       {sub && (
         <Reveal delay={0.15} distance={20}>
           <p className={clsx('mt-6 max-w-xl text-base leading-relaxed sm:text-lg', align === 'center' && 'mx-auto', tone === 'dark' ? 'text-white/70' : 'text-ink/70')}>{sub}</p>
@@ -166,7 +166,8 @@ export function PageHero({ label, title, sub, children }: { label: string; title
     <section className="relative overflow-hidden pt-36 pb-16 sm:pt-44 sm:pb-20">
       <div className="pattern-wave-light pointer-events-none absolute inset-0 opacity-60 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
       <div className="container-x relative">
-        <SectionHeading label={label} title={title} sub={sub} />
+        {/* a page hero's heading is the page's h1 */}
+        <SectionHeading as="h1" label={label} title={title} sub={sub} />
         <FineRule className="mt-10 w-48 text-navy" />
         {children}
       </div>

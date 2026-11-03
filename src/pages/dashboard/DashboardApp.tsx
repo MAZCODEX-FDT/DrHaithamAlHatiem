@@ -12,6 +12,7 @@ import TipsCms from './TipsCms'
 import ReviewsPage from './Reviews'
 import SettingsPage from './Settings'
 import { withBase } from '@/lib/base'
+import { Seo } from '@/components/seo/Seo'
 
 /**
  * Front-end demo gate. A production deployment must put the dashboard behind
@@ -43,6 +44,8 @@ export default function DashboardApp() {
 
   if (!authed)
     return (
+      <>
+      <Seo title="Clinic dashboard" description="Clinic team access only." path="/dashboard" noindex />
       <Login
         onLogin={() => {
           try {
@@ -53,10 +56,13 @@ export default function DashboardApp() {
           setAuthed(true)
         }}
       />
+      </>
     )
 
   return (
-    <Shell
+    <>
+      <Seo title="Clinic dashboard" description="Clinic team access only." path="/dashboard" noindex />
+      <Shell
       onLogout={() => {
         try {
           sessionStorage.removeItem(AUTH_KEY)
@@ -66,6 +72,7 @@ export default function DashboardApp() {
         setAuthed(false)
       }}
     />
+    </>
   )
 }
 

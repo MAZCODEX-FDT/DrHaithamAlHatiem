@@ -8,9 +8,12 @@ import { FaqSection } from './home/Sections'
 import { BookingSection, WhatsAppIcon } from '@/components/site/BookingRequest'
 import { WEEK, allPhones, branchDays, branchFrom, branchPhones, sendWhatsApp, telHref, waHref } from '@/lib/contact'
 
+import { Seo } from '@/components/seo/Seo'
+import { breadcrumbs, practice } from '@/lib/schema'
+
 export default function Contact() {
   const { t, tr, lang } = useI18n()
-  const { settings } = usePublicData()
+  const { settings, services } = usePublicData()
   const [form, setForm] = useState({ name: '', phone: '', email: '', message: '' })
   const [sent, setSent] = useState(false)
   const todayKey = dayFromIndex[new Date().getDay()]
@@ -37,6 +40,7 @@ export default function Contact() {
 
   return (
     <>
+      <Seo title={t('seo.contact.title')} description={t('seo.contact.desc')} path="/contact" jsonLd={[practice(settings, services, lang), breadcrumbs([{ name: t('nav.home'), path: '/' }, { name: t('nav.contact'), path: '/contact' }], lang)]} />
       <PageHero label={t('contact.label')} title={t('contact.title')} />
       <section className="pb-24">
         <div className="container-x grid gap-4 lg:grid-cols-12">
