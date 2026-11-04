@@ -1,7 +1,8 @@
 /**
  * Pre-render every public page, in English and Arabic, to static HTML so search
  * engines and AI crawlers that don't run JavaScript still read the full content.
- * Also writes sitemap.xml, robots.txt, llms.txt and llms-full.txt.
+ * Also writes llms.txt and llms-full.txt. (sitemap.xml and robots.txt are written by
+ * `vite build` itself, from the same list of pages in scripts/seo.ts.)
  *
  * Run after `vite build`:  node --experimental-strip-types scripts/prerender.mjs
  * Env: BASE_PATH (e.g. /DrHaithamAlHatiem/), SITE_URL (absolute, no trailing slash)
@@ -10,19 +11,14 @@ import { createServer } from 'node:http'
 import { copyFile, mkdir, readFile, stat, writeFile } from 'node:fs/promises'
 import { extname, join, resolve } from 'node:path'
 import { chromium } from 'playwright'
-import { services, settings, tips } from '../src/data/seed.ts'
+import { settings } from '../src/data/seed.ts'
 import { serviceContent } from '../src/data/serviceContent.ts'
+import { LANGS, activeServices, publishedTips, routes, siteUrl, urlOf as siteUrlOf } from './seo.ts'
 
 const DIST = resolve('dist')
 const BASE = process.env.BASE_PATH || '/'
-const SITE = (process.env.SITE_URL || 'https://mazcodex-fdt.github.io/DrHaithamAlHatiem').replace(/\/$/, '')
-const TODAY = new Date().toISOString().slice(0, 10)
-
-const activeServices = services.filter((s) => s.active).sort((a, b) => a.order - b.order)
-const publishedTips = tips.filter((t) => t.published)
-const routes = ['/', '/about', '/services', ...activeServices.map((s) => `/services/${s.slug}`), '/guide', ...publishedTips.map((t) => `/guide/${t.slug}`), '/contact', '/book']
-const LANGS = ['en', 'ar']
-const urlOf = (route, lang) => `${SITE}${lang === 'ar' ? '/ar' : ''}${route === '/' ? '' : route}/`
+const SITE = siteUrl()
+const urlOf = (route, lang) => siteUrlOf(SITE, route, lang)
 
 // ---------- a tiny static server that behaves like GitHub Pages ----------
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.json': 'application/json', '.txt': 'text/plain' }
@@ -89,52 +85,6 @@ if (errors.length) {
   console.error('Page errors while pre-rendering:\n' + errors.join('\n'))
   process.exit(1)
 }
-
-// ---------- sitemap.xml ----------
-const lastmod = (route) => publishedTips.find((t) => route === `/guide/${t.slug}`)?.date ?? TODAY
-const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${routes
-  .flatMap((route) =>
-    LANGS.map(
-      (lang) => `  <url>
-    <loc>${urlOf(route, lang)}</loc>
-    <lastmod>${lastmod(route)}</lastmod>
-    <xhtml:link rel="alternate" hreflang="en" href="${urlOf(route, 'en')}"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="${urlOf(route, 'ar')}"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="${urlOf(route, 'en')}"/>
-  </url>`,
-    ),
-  )
-  .join('\n')}
-</urlset>
-`
-await writeFile(join(DIST, 'sitemap.xml'), sitemap)
-
-// ---------- robots.txt (crawlers read it at the domain root; it applies once the site has its own domain) ----------
-const robots = `# Search engines and AI assistants are welcome to read and cite this site.
-User-agent: *
-Allow: /
-Disallow: ${BASE}dashboard
-Disallow: ${BASE}ar/dashboard
-
-User-agent: GPTBot
-User-agent: OAI-SearchBot
-User-agent: ChatGPT-User
-User-agent: ClaudeBot
-User-agent: Claude-SearchBot
-User-agent: Claude-User
-User-agent: PerplexityBot
-User-agent: Perplexity-User
-User-agent: Google-Extended
-User-agent: Applebot-Extended
-User-agent: CCBot
-Allow: /
-Disallow: ${BASE}dashboard
-
-Sitemap: ${SITE}/sitemap.xml
-`
-await writeFile(join(DIST, 'robots.txt'), robots)
 
 // ---------- llms.txt / llms-full.txt (a plain summary for AI assistants) ----------
 const d = settings.doctor

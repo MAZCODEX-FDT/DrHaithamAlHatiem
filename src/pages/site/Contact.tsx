@@ -7,6 +7,7 @@ import { dayFromIndex, dayNames, useI18n } from '@/lib/i18n'
 import { FaqSection } from './home/Sections'
 import { BookingSection, WhatsAppIcon } from '@/components/site/BookingRequest'
 import { WEEK, allPhones, branchDays, branchFrom, branchPhones, sendWhatsApp, telHref, waHref } from '@/lib/contact'
+import { trackLead } from '@/lib/analytics'
 
 import { Seo } from '@/components/seo/Seo'
 import { breadcrumbs, practice } from '@/lib/schema'
@@ -34,6 +35,7 @@ export default function Contact() {
         form.message.trim(),
       ].join('\n'),
     )
+    trackLead('contact_form')
     setSent(true)
     setForm({ name: '', phone: '', email: '', message: '' })
   }

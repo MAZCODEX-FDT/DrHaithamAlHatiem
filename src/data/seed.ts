@@ -1,4 +1,4 @@
-import type { DB, Faq, Review, Service, Settings, Tip } from './types'
+import type { DB, Faq, Review, Service, Settings, Tip } from './types.ts'
 
 /* ───────────────────────── Services ───────────────────────── */
 
