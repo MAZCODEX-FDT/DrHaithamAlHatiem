@@ -1,4 +1,15 @@
-name: Deploy to GitHub Pages
+name: Build and deploy to Bluehost
+
+# Every push builds the site; pushes to main (and manual runs) also upload it to
+# the Bluehost hosting of drhaithamelhatiem.com over FTPS.
+#
+# One-time setup in GitHub (Settings > Secrets and variables > Actions):
+#   Secrets:   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD  (an FTP account from Bluehost cPanel)
+#   Variables (optional):
+#     SITE_URL        public address, default https://drhaithamelhatiem.com
+#     FTP_SERVER_DIR  folder on the server, default ./ (an FTP account whose home is public_html)
+#     FTP_SECURITY    strict (default) or loose, if the server's certificate name does not match FTP_SERVER
+#     VITE_GA4_ID / VITE_META_PIXEL_ID  analytics, off unless set
 
 on:
   push:
@@ -6,19 +17,21 @@ on:
   workflow_dispatch:
 
 permissions:
-  actions: read
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: deploy-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
     # Playwright (used to pre-render the pages) supports Ubuntu 24.04; ubuntu-latest has moved past it
     runs-on: ubuntu-24.04
+    env:
+      # the site lives at the domain root; canonical URLs, hreflang, sitemap, robots.txt
+      # and structured data all use the public address
+      BASE_PATH: /
+      SITE_URL: ${{ vars.SITE_URL || 'https://drhaithamelhatiem.com' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -26,47 +39,57 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Site address
-        # canonical URLs, hreflang, sitemap and structured data all use the public address
-        run: |
-          echo "BASE_PATH=/${{ github.event.repository.name }}/" >> "$GITHUB_ENV"
-          echo "SITE_URL=https://$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]').github.io/${{ github.event.repository.name }}" >> "$GITHUB_ENV"
       # sitemap.xml and robots.txt are written by the build. Analytics stay off unless the
-      # repository variables VITE_GA4_ID / VITE_META_PIXEL_ID are set (Settings > Secrets and variables > Actions > Variables)
+      # repository variables VITE_GA4_ID / VITE_META_PIXEL_ID are set
       - run: npm run build
         env:
           VITE_SITE_URL: ${{ env.SITE_URL }}
           VITE_GA4_ID: ${{ vars.VITE_GA4_ID }}
           VITE_META_PIXEL_ID: ${{ vars.VITE_META_PIXEL_ID }}
       # Every public page, in English and Arabic, is rendered to static HTML for search engines and
-      # AI crawlers, plus llms.txt and llms-full.txt. 404.html stays the bare app shell, so
-      # other paths (e.g. /dashboard) still load the app, which then routes.
+      # AI crawlers, plus llms.txt and llms-full.txt. 404.html stays the bare app shell, which
+      # .htaccess serves for other paths (e.g. /dashboard), and the app then routes.
       - run: npx playwright install --with-deps chromium
       - run: npm run prerender
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
+          name: site
           path: dist
+          include-hidden-files: true # .htaccess
+          retention-days: 7
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
     environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      name: bluehost
+      url: ${{ vars.SITE_URL || 'https://drhaithamelhatiem.com' }}
     steps:
-      # While Pages' source is still "Deploy from a branch", GitHub also runs its own
-      # "pages build and deployment" on every push, publishing the unbuilt source
-      # (a blank page). Let it finish first so this build is always deployed last.
-      - name: Wait for GitHub's branch deploy of this commit
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: dist
+      - name: Check the FTP secrets are set
         env:
-          GH_TOKEN: ${{ github.token }}
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          for i in $(seq 1 36); do
-            pending=$(gh api "repos/${{ github.repository }}/actions/runs?head_sha=${{ github.sha }}&per_page=50" \
-              --jq '[.workflow_runs[] | select(.name == "pages build and deployment" and .status != "completed")] | length')
-            [ "$pending" = "0" ] && break
-            echo "Branch deploy still running, waiting…"
-            sleep 10
-          done
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          missing=""
+          for v in FTP_SERVER FTP_USERNAME FTP_PASSWORD; do [ -n "${!v}" ] || missing="$missing $v"; done
+          if [ -n "$missing" ]; then
+            echo "::error::Add these repository secrets (Settings > Secrets and variables > Actions):$missing"
+            exit 1
+          fi
+      # Uploads only what changed since the last deploy (it keeps a small sync-state file on the server)
+      - uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          security: ${{ vars.FTP_SECURITY || 'strict' }}
+          local-dir: ./dist/
+          server-dir: ${{ vars.FTP_SERVER_DIR || './' }}

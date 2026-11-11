@@ -20,8 +20,8 @@ All settings are read at build time. Copy `.env.example` to `.env.local` for loc
 
 | Variable | What it does |
 | --- | --- |
-| `VITE_SITE_URL` (or `SITE_URL`) | Public address, no trailing slash. Used for canonical and `hreflang` links, structured data, `sitemap.xml` and `robots.txt`. If empty: Vercel's production domain on Vercel, otherwise `https://mazcodex-fdt.github.io/DrHaithamAlHatiem`. Set it once the site has its own domain. |
-| `BASE_PATH` | Deploy sub-path, e.g. `/DrHaithamAlHatiem/` on GitHub Pages (the workflow sets it). Shell/CI only; default `/`. |
+| `VITE_SITE_URL` (or `SITE_URL`) | Public address, no trailing slash. Used for canonical and `hreflang` links, structured data, `sitemap.xml` and `robots.txt`. The deploy workflow sets `https://drhaithamelhatiem.com`. If empty: Vercel's production domain on Vercel, otherwise the old GitHub Pages address. |
+| `BASE_PATH` | Deploy sub-path. `/` on the domain (the workflow sets it); `/DrHaithamAlHatiem/` was for GitHub Pages. Shell/CI only; default `/`. |
 | `VITE_GA4_ID` | Google Analytics 4 measurement ID (`G-…`). Empty: GA4 is not loaded. |
 | `VITE_META_PIXEL_ID` | Meta (Facebook) Pixel ID. Empty: the pixel is not loaded. |
 
@@ -95,7 +95,14 @@ The components in `src/components/reactbits/` come from [React Bits](https://git
 
 ## Deploy
 
-This is a static SPA. `public/_redirects` (Netlify) and `vercel.json` route every path to `index.html`. On Apache/cPanel, add an `.htaccess` rewrite to `index.html`.
+The live site is **https://drhaithamelhatiem.com**, on Bluehost hosting.
 
-- **GitHub Pages:** `.github/workflows/deploy.yml` builds, pre-renders and publishes on every push to `main`.
-- **Vercel:** runs `npm run build` only (no pre-render, so no `llms.txt` and no static HTML per page). `sitemap.xml` and `robots.txt` are still produced, using the project's production domain unless `VITE_SITE_URL` is set.
+- **Bluehost (production):** `.github/workflows/deploy.yml` builds and pre-renders on every push. On `main` (or a manual run from the Actions tab) it uploads `dist/` to the hosting over FTPS, sending only changed files. Pushes to other branches build only, as a check.
+  - **Secrets** (Settings → Secrets and variables → Actions): `FTP_SERVER`, `FTP_USERNAME`, `FTP_PASSWORD`. Use an FTP account created in Bluehost cPanel → FTP Accounts, with its directory set to `public_html`.
+  - **Variables** (optional): `SITE_URL` (default `https://drhaithamelhatiem.com`), `FTP_SERVER_DIR` (default `./`), `FTP_SECURITY` (`strict` by default; `loose` only if the deploy fails on a certificate name mismatch).
+  - **`public/.htaccess`** (Apache):
+    - forces `https://` and the bare domain;
+    - serves each page's pre-rendered `index.html`, and the app shell (`404.html`) for everything else, e.g. `/dashboard`;
+    - caches the hashed assets for a year.
+- **GitHub Pages** is no longer deployed. Turn it off (Settings → Pages) so a second copy of the site doesn't compete with the domain in search results.
+- **Vercel:** runs `npm run build` only (no pre-render, so no `llms.txt` and no static HTML per page). `public/_redirects` (Netlify) and `vercel.json` route every path to `index.html`.
