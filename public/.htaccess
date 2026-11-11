@@ -1,6 +1,6 @@
 # Apache settings for the Bluehost hosting of drhaithamelhatiem.com
 
-Options -Indexes
+# (no Options lines: some shared hosts reject them in .htaccess with a 500 error)
 DirectoryIndex index.html
 
 <IfModule mod_rewrite.c>
@@ -21,10 +21,11 @@ DirectoryIndex index.html
 
 # Built assets carry a content hash in their names, so they can be cached for a year
 <IfModule mod_headers.c>
-  <FilesMatch "^assets/">
+  # FilesMatch only sees file names, so the assets folder is matched by path
+  <If "%{REQUEST_URI} =~ m#^/assets/#">
     Header set Cache-Control "public, max-age=31536000, immutable"
-  </FilesMatch>
-  <FilesMatch "\.(html)$">
+  </If>
+  <FilesMatch "\.html$">
     Header set Cache-Control "no-cache"
   </FilesMatch>
   Header always set X-Content-Type-Options "nosniff"
