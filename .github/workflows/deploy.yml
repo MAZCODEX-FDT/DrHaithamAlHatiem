@@ -27,6 +27,7 @@ jobs:
   build:
     # Playwright (used to pre-render the pages) supports Ubuntu 24.04; ubuntu-latest has moved past it
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     env:
       # the site lives at the domain root; canonical URLs, hreflang, sitemap, robots.txt
       # and structured data all use the public address
@@ -49,8 +50,19 @@ jobs:
       # Every public page, in English and Arabic, is rendered to static HTML for search engines and
       # AI crawlers, plus llms.txt and llms-full.txt. 404.html stays the bare app shell, which
       # .htaccess serves for other paths (e.g. /dashboard), and the app then routes.
-      - run: npx playwright install --with-deps chromium
+      # The runner image ships Google Chrome; use it rather than downloading a browser and its
+      # system packages (that apt step can stall on the runner's mirror). Install only as a fallback.
+      - name: Browser for pre-rendering
+        timeout-minutes: 8
+        run: |
+          if command -v google-chrome >/dev/null; then
+            echo "CHROMIUM_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+            google-chrome --version
+          else
+            npx playwright install --with-deps chromium
+          fi
       - run: npm run prerender
+        timeout-minutes: 8
       - uses: actions/upload-artifact@v4
         with:
           name: site
@@ -62,6 +74,7 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     environment:
       name: bluehost
       url: ${{ vars.SITE_URL || 'https://drhaithamelhatiem.com' }}
