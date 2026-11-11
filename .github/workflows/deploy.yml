@@ -31,11 +31,15 @@ jobs:
         run: |
           echo "BASE_PATH=/${{ github.event.repository.name }}/" >> "$GITHUB_ENV"
           echo "SITE_URL=https://$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]').github.io/${{ github.event.repository.name }}" >> "$GITHUB_ENV"
+      # sitemap.xml and robots.txt are written by the build. Analytics stay off unless the
+      # repository variables VITE_GA4_ID / VITE_META_PIXEL_ID are set (Settings > Secrets and variables > Actions > Variables)
       - run: npm run build
         env:
           VITE_SITE_URL: ${{ env.SITE_URL }}
+          VITE_GA4_ID: ${{ vars.VITE_GA4_ID }}
+          VITE_META_PIXEL_ID: ${{ vars.VITE_META_PIXEL_ID }}
       # Every public page, in English and Arabic, is rendered to static HTML for search engines and
-      # AI crawlers, plus sitemap.xml, robots.txt and llms.txt. 404.html stays the bare app shell, so
+      # AI crawlers, plus llms.txt and llms-full.txt. 404.html stays the bare app shell, so
       # other paths (e.g. /dashboard) still load the app, which then routes.
       - run: npx playwright install --with-deps chromium
       - run: npm run prerender

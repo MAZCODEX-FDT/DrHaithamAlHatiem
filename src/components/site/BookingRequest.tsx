@@ -8,6 +8,7 @@ import { DatePicker, Select, TimePicker, timeOptions } from '@/components/site/P
 import { Reveal } from '@/components/site/ui'
 import { usePublicData } from '@/data/store'
 import { allPhones, branchDays, branchFrom, branchPhones, clinicPhones, primaryPhone, sendWhatsApp, telHref, waHref } from '@/lib/contact'
+import { trackLead } from '@/lib/analytics'
 import { dayFromIndex, formatDate, formatTime, useI18n } from '@/lib/i18n'
 import { gsap } from '@/lib/smooth'
 
@@ -51,6 +52,7 @@ export function BookingRequestForm({ serviceId: preset, compact, onDone }: { ser
     ]
     const text = lines.filter((l) => l !== false && l !== undefined && l !== null).join('\n')
     sendWhatsApp(settings.whatsapp, text)
+    trackLead('booking_form')
     setSent(text)
   }
 

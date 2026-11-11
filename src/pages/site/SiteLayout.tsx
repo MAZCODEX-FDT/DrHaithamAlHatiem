@@ -1,5 +1,5 @@
-import { createContext, useContext, useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { createContext, useContext, useEffect, useState } from 'react'
+import { Outlet, useLocation } from 'react-router-dom'
 import { X } from 'lucide-react'
 import { Header } from '@/components/site/Header'
 import { Footer } from '@/components/site/Footer'
@@ -8,6 +8,7 @@ import { FloatingContact } from '@/components/site/BookingRequest'
 import { SmoothScroll } from '@/lib/smooth'
 import { usePublicData } from '@/data/store'
 import { useI18n } from '@/lib/i18n'
+import { leadMethodOf, pauseAnalytics, startAnalytics, trackLead, trackPageView } from '@/lib/analytics'
 
 const ReadyCtx = createContext(true)
 /** true once the intro preloader has finished — hero entrance waits for it */
@@ -26,8 +27,38 @@ export default function SiteLayout() {
       </main>
       <Footer />
       <FloatingContact ready={ready} />
+      <Analytics />
     </ReadyCtx.Provider>
   )
+}
+
+/**
+ * GA4 / Meta Pixel for the public pages only (the dashboard has its own layout and never
+ * loads them). A page view on every route change, and a lead on every WhatsApp or phone link.
+ */
+function Analytics() {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    if (!startAnalytics()) return
+    const onClick = (e: MouseEvent) => {
+      const a = (e.target as Element | null)?.closest?.('a[href]')
+      const method = a && leadMethodOf(a.getAttribute('href') ?? '')
+      if (method) trackLead(method)
+    }
+    document.addEventListener('click', onClick, true)
+    return () => {
+      document.removeEventListener('click', onClick, true)
+      pauseAnalytics()
+    }
+  }, [])
+
+  // after the commit, so the new page's <title> is already in place
+  useEffect(() => {
+    trackPageView()
+  }, [pathname])
+
+  return null
 }
 
 function Announcement() {
